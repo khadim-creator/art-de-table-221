@@ -1,0 +1,130 @@
+{
+  "entities": {
+    "products": {
+      "title": "Products",
+      "description": "Customizable e-commerce products for Art de Table",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the product" },
+        "name": { "type": "string", "description": "Product name" },
+        "price": { "type": "number", "description": "Base price in FCFA" },
+        "category": { "type": "string", "description": "Category slug" },
+        "images": { "type": "array", "description": "Product image URLs" },
+        "description": { "type": "string", "description": "Detailed description in French" },
+        "minQty": { "type": "number", "description": "Minimum order quantity" },
+        "productionDelay": { "type": "string", "description": "Estimated production time" },
+        "isCustomizable": { "type": "boolean", "description": "Whether customization features are unlocked" },
+        "stock": { "type": "number", "description": "Available stock quantity" },
+        "rating": { "type": "number", "description": "Average user rating" },
+        "reviewsCount": { "type": "number", "description": "Total number of reviews" }
+      },
+      "required": ["name", "price", "category", "minQty", "productionDelay", "isCustomizable"]
+    },
+    "categories": {
+      "title": "Categories",
+      "description": "Packaging and event universes",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "slug": { "type": "string" },
+        "description": { "type": "string" },
+        "image": { "type": "string" }
+      },
+      "required": ["name", "slug"]
+    },
+    "orders": {
+      "title": "Orders",
+      "description": "Customer purchase orders",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "customerId": { "type": "string" },
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "address": { "type": "string" },
+        "deliveryMethod": { "type": "string", "enum": ["retrait", "livraison"] },
+        "paymentMethod": { "type": "string", "enum": ["wave", "orange_money", "cash_on_delivery"] },
+        "items": { "type": "array" },
+        "totalAmount": { "type": "number" },
+        "status": { "type": "string", "enum": ["en_attente", "en_production", "expediee", "livree", "annulee"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["customerId", "name", "phone", "email", "address", "deliveryMethod", "paymentMethod", "items", "totalAmount", "status", "createdAt"]
+    },
+    "quotes": {
+      "title": "Quotes",
+      "description": "Custom quotes submissions (Devis)",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "description": { "type": "string" },
+        "targetQuantity": { "type": "number" },
+        "category": { "type": "string" },
+        "customLogoUrl": { "type": "string" },
+        "status": { "type": "string", "enum": ["en_attente", "approuve", "refuse", "modifie"] },
+        "adminOfferAmount": { "type": "number" },
+        "adminNotes": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["name", "phone", "email", "description", "targetQuantity", "category", "status", "createdAt"]
+    },
+    "testimonials": {
+      "title": "Testimonials",
+      "description": "Client reviews & testimonials",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "comment": { "type": "string" },
+        "rating": { "type": "number" },
+        "avatar": { "type": "string" }
+      },
+      "required": ["name", "comment", "rating"]
+    },
+    "promotions": {
+      "title": "Promotions",
+      "description": "Active promotional discount codes",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "code": { "type": "string" },
+        "discountPercent": { "type": "number" },
+        "active": { "type": "boolean" },
+        "description": { "type": "string" }
+      },
+      "required": ["code", "discountPercent", "active"]
+    }
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": "products",
+      "description": "Standard customizable packaging products"
+    },
+    "/categories/{categoryId}": {
+      "schema": "categories",
+      "description": "Product categories"
+    },
+    "/orders/{orderId}": {
+      "schema": "orders",
+      "description": "Customer standard purchase orders"
+    },
+    "/quotes/{quoteId}": {
+      "schema": "quotes",
+      "description": "Customer personalized event custom quotes requests"
+    },
+    "/testimonials/{testimonialId}": {
+      "schema": "testimonials",
+      "description": "Client stories and beautiful moments reviews"
+    },
+    "/promotions/{promoId}": {
+      "schema": "promotions",
+      "description": "Active promo coupons"
+    }
+  }
+}

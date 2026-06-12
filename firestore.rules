@@ -1,0 +1,130 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Auth helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (request.auth.token.email == "khadidia@art.detable.com" || request.auth.token.email == "khadxxm05@gmail.com");
+    }
+
+    function isValidId(id) {
+       return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-+$.@%]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation functions
+    function isValidProduct(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 200
+        && data.price is number && data.price >= 0
+        && data.category is string && data.category.size() <= 100
+        && (data.description is string ? data.description.size() <= 2000 : true)
+        && data.minQty is number && data.minQty >= 1
+        && data.productionDelay is string && data.productionDelay.size() <= 100
+        && data.isCustomizable is bool;
+    }
+
+    function isValidCategory(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 100
+        && data.slug is string && data.slug.size() > 0 && data.slug.size() <= 100
+        && (data.description is string ? data.description.size() <= 1000 : true)
+        && (data.image is string ? data.image.size() <= 2000000 : true);
+    }
+
+    function isValidOrder(data) {
+      return data.customerId is string && data.customerId.size() <= 128
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 150
+        && data.phone is string && data.phone.size() > 0 && data.phone.size() <= 50
+        && data.email is string && data.email.size() > 0 && data.email.size() <= 150
+        && data.address is string && data.address.size() > 0 && data.address.size() <= 500
+        && data.deliveryMethod is string && (data.deliveryMethod == "retrait" || data.deliveryMethod == "livraison")
+        && data.paymentMethod is string && (data.paymentMethod == "wave" || data.paymentMethod == "orange_money" || data.paymentMethod == "cash_on_delivery")
+        && data.totalAmount is number && data.totalAmount >= 0
+        && data.status is string && (data.status == "en_attente" || data.status == "validation" || data.status == "production" || data.status == "impression" || data.status == "expedition" || data.status == "livre" || data.status == "annule" || data.status == "en_production" || data.status == "expediee" || data.status == "livree" || data.status == "annulee")
+        && data.items is list && data.items.size() >= 0 && data.items.size() <= 100
+        && data.createdAt is string;
+    }
+
+    function isValidQuote(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 150
+        && data.phone is string && data.phone.size() > 0 && data.phone.size() <= 50
+        && data.email is string && data.email.size() > 0 && data.email.size() <= 150
+        && data.description is string && data.description.size() > 0 && data.description.size() <= 3000
+        && data.targetQuantity is number && data.targetQuantity >= 1
+        && data.category is string && data.category.size() <= 100
+        && data.status is string && (data.status == "en_attente" || data.status == "approuve" || data.status == "refuse" || data.status == "modifie")
+        && data.createdAt is string;
+    }
+
+    function isValidTestimonial(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 100
+        && data.comment is string && data.comment.size() > 0 && data.comment.size() <= 1000
+        && data.rating is number && data.rating >= 1 && data.rating <= 5;
+    }
+
+    function isValidPromotion(data) {
+      return data.code is string && data.code.size() > 0 && data.code.size() <= 20
+        && data.discountPercent is number && data.discountPercent >= 0 && data.discountPercent <= 100
+        && data.active is bool;
+    }
+
+    // Rules for collections
+    match /products/{productId} {
+      allow read, write: if true;
+    }
+
+    match /categories/{categoryId} {
+      allow read, write: if true;
+    }
+
+    match /orders/{orderId} {
+      allow read: if resource.data.customerId.startsWith('guest-') || (isSignedIn() && (resource.data.customerId == request.auth.uid || isAdmin()));
+      allow create: if isValidOrder(incoming()) && (incoming().customerId.startsWith('guest-') || (isSignedIn() && incoming().customerId == request.auth.uid));
+      allow update: if (isAdmin() || (isSignedIn() && existing().customerId == request.auth.uid))
+        && isValidOrder(incoming())
+        && (
+          (isAdmin() && incoming().diff(existing()).affectedKeys().hasAny(['status', 'adminNotes', 'adminOfferAmount'])) ||
+          (!isAdmin() && existing().status == "en_attente" && incoming().status == "annulee" && incoming().diff(existing()).affectedKeys().hasOnly(['status']))
+        );
+      allow delete: if isAdmin();
+    }
+
+    match /quotes/{quoteId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && isValidQuote(incoming()) && incoming().userId == request.auth.uid;
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /testimonials/{testimonialId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /promotions/{promoId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /stockHistory/{logId} {
+      allow read: if isAdmin();
+      allow create, update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+  }
+}

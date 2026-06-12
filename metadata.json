@@ -1,0 +1,6 @@
+{
+  "name": "Art de Table",
+  "description": "E-commerce prestige et outils ERP de commande d'emballages personnalises de luxe a Dakar, Senegal.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
