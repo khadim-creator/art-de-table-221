@@ -32,7 +32,7 @@ export const Hero: React.FC = () => {
   return (
     <section
       className="relative w-full overflow-hidden bg-gray-900"
-      style={{ marginTop: '0', height: '200vh', minHeight: '500px', maxHeight: '200vh' }}
+      style={{ marginTop: '0', height: '100vh', minHeight: '300px', maxHeight: '80vh' }}
     >
       {slides.map((s, i) => (
         <img key={i} src={s.image} alt={s.title}
