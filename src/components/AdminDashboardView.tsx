@@ -2409,7 +2409,33 @@ export const AdminDashboardView: React.FC = () => {
           </div>
         </div>
       )}
-
+{/* Fenêtre Modale d'accès à la bibliothèque de médias */}
+      {productImagePicker && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="bg-[#1A1A1A] border border-[#D4AF37]/30 w-full max-w-5xl h-[85vh] rounded-[2rem] flex flex-col relative overflow-hidden shadow-2xl">
+            <div className="p-6 border-b border-stone-800 flex justify-between items-center bg-[#111111]">
+              <div className="space-y-1">
+                <h3 className="font-serif text-lg text-white font-bold">{productImagePicker.title}</h3>
+                <p className="text-[10px] text-stone-400 font-mono uppercase tracking-wider">Sélectionnez une image pour l'associer à l'article</p>
+              </div>
+              <button 
+                onClick={() => setProductImagePicker(null)} 
+                className="text-stone-400 hover:text-white border border-stone-800 hover:border-stone-700 p-2 rounded-xl transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6 bg-[#161616]">
+              <AdminMediaLibrary 
+                onSelectImage={(url) => {
+                  productImagePicker.onSelect(url);
+                  setProductImagePicker(null);
+                }} 
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
