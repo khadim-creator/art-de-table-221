@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { User, ClipboardList, TrendingUp, Inbox, ShieldAlert, BadgeInfo, CheckCircle, Mail, Phone, Calendar } from 'lucide-react';
 
@@ -10,6 +10,20 @@ export const UserDashboardView: React.FC = () => {
     setView, 
     triggerWhatsAppOrder 
   } = useApp();
+
+  // Écouteur automatique pour rafraîchir l'interface client lors des modifications de l'admin
+  useEffect(() => {
+    const handleCatalogRefresh = () => {
+      // Si tes données proviennent d'un contexte global ou d'une fonction de rechargement :
+      // exemple: refreshData();
+      
+      // Si tu as besoin de forcer React à rafraîchir l'affichage local :
+      window.location.reload(); 
+    };
+
+    window.addEventListener('catalog_updated', handleCatalogRefresh);
+    return () => window.removeEventListener('catalog_updated', handleCatalogRefresh);
+  }, []);
 
   if (!currentUser) {
     return (
