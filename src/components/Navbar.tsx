@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
-import { ShoppingBag, User, LogOut, Menu, X, Search, ChevronDown } from 'lucide-react';
-import logoImg from '../assets/images/logo.jpg';
+import { ShoppingBag, User, LogOut, Menu, X, Home, ShieldCheck, Search } from 'lucide-react';
+import logoImg from '../assets/images/logo-adt.png';
 
 const categories = [
   {
@@ -132,23 +132,76 @@ const categories = [
     ],
   },
 ];
+
+// Quick-access categories shown in the desktop top bar (priorités marketing)
+const QUICK_CATS = [
+  { label: 'Packaging', slug: 'sacs-emballages-boutique' },
+  { label: 'Événementiel', slug: 'evenementiel' },
+  { label: 'Alimentaire', slug: 'emballages-alimentaires' },
+  { label: 'Cadeaux', slug: 'packaging-cadeaux' },
+  { label: 'Cosmétique', slug: 'parfumerie-cosmetique' },
+  { label: 'Impression', slug: 'solutions-impression' },
+];
+
 export const Navbar: React.FC = () => {
-  const { currentView, setView, cart, currentUser, logout, setSelectedCategory } = useApp();
+  const { currentView, setView, cart, currentUser, logout, setSelectedCategory, selectedCategoryId, searchQuery, setSearchQuery } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [catMenuOpen, setCatMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isHeaderHidden, setIsHeaderHidden] = useState(false);
+  const [catBarVisible, setCatBarVisible] = useState(true);
+  const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
+  const lastScrollYRef = useRef(0);
+  const categoryMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const fn = () => setIsScrolled(window.scrollY > 10);
-    window.addEventListener('scroll', fn);
+    const fn = () => {
+      const currentScrollY = window.scrollY;
+      const previousScrollY = lastScrollYRef.current;
+      const scrollDelta = currentScrollY - previousScrollY;
+      const scrolled = currentScrollY > 10;
+
+      setIsScrolled(scrolled);
+      // Réduire le bandeau catégories après 120px de scroll
+      setCatBarVisible(currentScrollY < 120);
+
+      if (currentScrollY < 80 || scrollDelta < -6) {
+        setIsHeaderHidden(false);
+      } else if (currentScrollY > 140 && scrollDelta > 6) {
+        setIsHeaderHidden(true);
+      }
+
+      lastScrollYRef.current = Math.max(currentScrollY, 0);
+    };
+    fn();
+    window.addEventListener('scroll', fn, { passive: true });
     return () => window.removeEventListener('scroll', fn);
   }, []);
+
+  useEffect(() => {
+    const onPointerDown = (event: MouseEvent) => {
+      if (!categoryMenuRef.current) return;
+      if (!categoryMenuRef.current.contains(event.target as Node)) {
+        setCategoryMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('mousedown', onPointerDown);
+    return () => window.removeEventListener('mousedown', onPointerDown);
+  }, []);
+
+  // Restore catBar when navigating to shop
+  useEffect(() => {
+    if (currentView === 'shop') {
+      setCatBarVisible(true);
+    }
+    setIsHeaderHidden(false);
+    lastScrollYRef.current = window.scrollY;
+  }, [currentView]);
 
   const totalCartCount = cart.reduce((acc, i) => acc + i.quantity, 0);
 
   const goTo = (view: string) => {
     setMobileMenuOpen(false);
-    setCatMenuOpen(false);
     if (view === 'contact') {
       setView('home');
       setTimeout(() => {
@@ -164,178 +217,344 @@ export const Navbar: React.FC = () => {
 
   const goToCategory = (slug: string) => {
     setMobileMenuOpen(false);
-    setCatMenuOpen(false);
+    setCategoryMenuOpen(false);
+    setSearchQuery('');
     setSelectedCategory(slug);
     setView('shop');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const goToHome = () => {
+    setMobileMenuOpen(false);
+    setCategoryMenuOpen(false);
+    setSearchQuery('');
+    setSelectedCategory(null);
+    setView('shop');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Height of the navbar for offset calculations
+  const navbarHeight = catBarVisible && currentView !== 'product-detail' ? 'h-12' : 'h-0';
+  const showDesktopCategoryBar = currentView !== 'admin-dashboard';
+  const hideHeader = isHeaderHidden && !mobileMenuOpen;
+
   return (
     <>
-      <header className={`fixed top-0 left-0 right-0 z-50 bg-white transition-shadow duration-300 ${isScrolled ? 'shadow-md' : 'shadow-sm'}`}>
+      <header
+        className={`sticky top-0 left-0 right-0 z-50 border-b border-[#A67C52]/14 bg-white backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] will-change-transform ${
+          hideHeader
+            ? '-translate-y-full shadow-none'
+            : 'translate-y-0 shadow-[0_10px_30px_rgba(166,124,82,0.09)]'
+        }`}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 md:h-20 gap-4">
-
-            {/* Mobile hamburger */}
-            <button className="md:hidden shrink-0 w-9 h-9 flex items-center justify-center text-gray-600" onClick={() => setMobileMenuOpen(true)}>
-              <Menu className="w-5 h-5" />
+          <div className={`flex items-center justify-between gap-3 md:gap-5 transition-all duration-300 ${isScrolled ? 'h-[6.7rem] md:h-[7.5rem]' : 'h-[7.4rem] md:h-[8.4rem]'}`}>
+            <button
+              aria-label="Ouvrir le menu"
+              className="md:hidden shrink-0 w-12 h-12 flex items-center justify-center text-[#6A5830] hover:text-[#8C6845] transition"
+              onClick={() => setMobileMenuOpen(true)}
+            >
+              <Menu className="w-6 h-6" />
             </button>
 
-            {/* LOGO */}
-            <button onClick={() => goTo('home')} className="flex items-center gap-2.5 shrink-0">
-              <img src={logoImg} alt="Art de Table" className="w-10 h-10 md:w-14 md:h-14 object-contain" />
-              <div className="flex flex-col leading-none">
-                <span className="font-serif font-black text-base md:text-xl text-[#1B1115]">
-                  Art de Table
-                </span>
-                <span className="hidden md:block text-[9px] tracking-[0.15em] text-gray-400 uppercase mt-0.5">
-                  Packaging · Emballage · Personnalisation
-                </span>
-              </div>
-            </button>
-
-            {/* BARRE DE RECHERCHE centrée */}
-            <div className="hidden md:flex flex-1 max-w-lg relative mx-4">
-              <input
-                type="text"
-                placeholder="Rechercher un produit, une catégorie..."
-                onFocus={() => { setView('shop'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                className="w-full h-10 pl-4 pr-12 rounded-full border border-gray-200 bg-gray-50 text-sm placeholder-gray-400 focus:outline-none focus:border-[#C9607A] focus:bg-white transition"
+            <button onClick={() => goTo('home')} className="shrink-0 group" aria-label="Retour à l'accueil">
+              <img
+                src={logoImg}
+                alt="Art de Table"
+                className={`object-contain ${isScrolled ? 'h-[5.25rem] w-[5.25rem] md:h-[6.25rem] md:w-[6.25rem]' : 'h-[5.75rem] w-[5.75rem] md:h-[6.75rem] md:w-[6.75rem]'}`}
               />
-              <button className="absolute right-0 top-0 h-10 w-10 flex items-center justify-center bg-[#C9607A] rounded-full hover:bg-[#b3536b] transition">
-                <Search className="w-4 h-4 text-white" />
-              </button>
+            </button>
+
+            <div ref={categoryMenuRef} className="hidden md:flex flex-1 max-w-3xl items-center gap-3">
+              <div className="relative shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setCategoryMenuOpen((open) => !open)}
+                  className={`inline-flex h-[3.25rem] items-center gap-2 rounded-full border px-5 text-[15px] font-semibold transition ${
+                    categoryMenuOpen
+                      ? 'border-[#A67C52]/30 bg-[#FFF4EA] text-[#8C6845]'
+                      : 'border-[#A67C52]/18 bg-[#FFF9F4] text-[#4B3A22] hover:bg-[#FFF4EA]'
+                  }`}
+                >
+                  <Menu className="h-4 w-4" />
+                  <span>Toutes les catégories</span>
+                </button>
+
+                <div
+                  className={`absolute left-0 top-[calc(100%+0.75rem)] z-50 w-[min(72rem,calc(100vw-2rem))] overflow-hidden rounded-[1.5rem] border border-[#A67C52]/15 bg-white shadow-[0_24px_80px_rgba(140,104,69,0.18)] transition-all duration-200 ${
+                    categoryMenuOpen ? 'pointer-events-auto translate-y-0 opacity-100' : 'pointer-events-none -translate-y-2 opacity-0'
+                  }`}
+                >
+                  <div className="grid gap-3 border-b border-[#A67C52]/10 bg-[linear-gradient(135deg,#1B1115_0%,#2A1B13_100%)] px-5 py-4 sm:px-6">
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/70">Catalogue complet</p>
+                      <h3 className="mt-1 font-display italic text-[1.5rem] leading-none text-white">
+                        Catégories et sous-catégories
+                      </h3>
+                    </div>
+                    <p className="max-w-2xl text-sm leading-relaxed text-white/72">
+                      Accédez directement à chaque univers et à ses déclinaisons depuis la barre du haut.
+                    </p>
+                  </div>
+
+                  <div className="max-h-[32rem] overflow-y-auto px-4 py-4 sm:px-5">
+                    <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
+                      {categories.map((cat) => (
+                        <div key={cat.slug} className="rounded-[1.1rem] border border-white/8 bg-[#1B1115] p-4 shadow-[0_10px_30px_rgba(27,17,21,0.16)]">
+                          <button
+                            type="button"
+                            onClick={() => goToCategory(cat.slug)}
+                            className={`flex w-full items-center justify-between gap-3 rounded-[0.9rem] px-3 py-2 text-left transition ${
+                              selectedCategoryId === cat.slug
+                                ? 'bg-[#A67C52] text-white'
+                                : 'bg-white/6 text-white hover:bg-white/10'
+                            }`}
+                          >
+                            <span className="text-[13px] font-semibold uppercase tracking-[0.12em]">{cat.label}</span>
+                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">Voir</span>
+                          </button>
+
+                          {cat.subcategories?.length ? (
+                            <div className="mt-3 flex flex-wrap gap-2">
+                              {cat.subcategories.map((sub) => (
+                                <button
+                                  key={sub.slug}
+                                  type="button"
+                                  onClick={() => goToCategory(sub.slug)}
+                                  className={`rounded-full border px-3 py-1.5 text-[11px] font-medium transition ${
+                                    selectedCategoryId === sub.slug
+                                      ? 'border-[#A67C52] bg-[#A67C52] text-white'
+                                      : 'border-white/10 bg-white/5 text-white/80 hover:bg-white/10'
+                                  }`}
+                                >
+                                  {sub.label}
+                                </button>
+                              ))}
+                            </div>
+                          ) : null}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative w-full">
+                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8C6845]" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSelectedCategory(null);
+                    setSearchQuery(e.target.value);
+                    setView('shop');
+                  }}
+                  onFocus={() => setView('shop')}
+                  placeholder="Rechercher un produit, une catégorie..."
+                  className="h-[3.25rem] w-full rounded-full border border-[#A67C52]/18 bg-white pl-11 pr-4 text-[15px] text-[#2A1B13] placeholder:text-stone-400 shadow-sm outline-none transition focus:border-[#A67C52]/35 focus:ring-2 focus:ring-[#A67C52]/10"
+                />
+              </div>
             </div>
 
-            {/* ACTIONS DROITE */}
             <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-              <button className="md:hidden w-9 h-9 flex items-center justify-center text-gray-600" onClick={() => goTo('shop')}>
-                <Search className="w-4 h-4" />
-              </button>
-
               {currentUser ? (
                 <div className="flex items-center gap-1">
-                  <button onClick={() => setView('dashboard')} className="hidden sm:flex items-center gap-1.5 h-9 px-3 rounded-full hover:bg-gray-100 transition text-sm text-gray-700 font-medium">
-                    <User className="w-4 h-4" />
+                  <button
+                    onClick={() => setView('dashboard')}
+                    className="hidden sm:flex items-center gap-1.5 h-[3.25rem] px-5 rounded-full bg-[#FFF9F4] border border-[#A67C52]/18 transition text-[15px] text-[#4B3A22] font-medium hover:bg-[#FFF4EA]"
+                  >
+                    <User className="w-5 h-5" />
                     <span className="hidden lg:inline">Mon compte</span>
                   </button>
                   {(currentUser?.isAdmin || currentUser?.email?.toLowerCase() === 'khadxxm05@gmail.com') && (
-                    <button onClick={() => setView('admin-dashboard')} className="hidden sm:flex h-9 px-3 rounded-full border border-amber-400 text-amber-600 text-xs font-bold hover:bg-amber-50 transition">
-                      Admin
+                    <button
+                      onClick={() => setView('admin-dashboard')}
+                      className="hidden sm:flex h-[3.25rem] w-[3.25rem] items-center justify-center rounded-full border border-[#A67C52]/18 bg-[#FFF9F4] text-[#4B3A22] hover:bg-[#FFF4EA] transition"
+                      aria-label="Administration"
+                    >
+                      <ShieldCheck className="w-5 h-5" />
                     </button>
                   )}
-                  <button onClick={logout} className="w-9 h-9 flex items-center justify-center text-gray-400 hover:text-red-500 transition">
-                    <LogOut className="w-4 h-4" />
+                  <button onClick={logout} className="w-[3.25rem] h-[3.25rem] flex items-center justify-center text-[#4B3A22] hover:bg-[#FFF4EA] transition rounded-full">
+                    <LogOut className="w-5 h-5" />
                   </button>
                 </div>
               ) : (
-                <button onClick={() => setView('login')} className="hidden sm:flex items-center gap-1.5 h-9 px-3 rounded-full hover:bg-gray-100 transition text-sm text-gray-700 font-medium">
-                  <User className="w-4 h-4" />
-                  <span className="hidden lg:inline">Connexion</span>
+                <button
+                  onClick={() => setView('login')}
+                  className="hidden sm:flex h-[3.25rem] w-[3.25rem] items-center justify-center rounded-full bg-[#FFF9F4] border border-[#A67C52]/18 transition text-[#4B3A22] hover:bg-[#FFF4EA]"
+                  aria-label="Administration"
+                >
+                  <User className="w-5 h-5" />
                 </button>
               )}
 
-              <button onClick={() => setView('cart')} className="relative flex items-center gap-1.5 h-9 px-3 rounded-full hover:bg-gray-100 transition text-sm text-gray-700 font-medium">
-                <ShoppingBag className="w-4 h-4" />
-                <span className="hidden sm:inline">Panier</span>
-                {totalCartCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 sm:static sm:inline-flex items-center justify-center bg-[#C9607A] text-white text-[9px] font-bold rounded-full w-4 h-4">
-                    {totalCartCount}
-                  </span>
-                )}
+                <button
+                onClick={() => setView('cart')}
+                  className="relative flex h-[3.25rem] w-[3.25rem] items-center justify-center rounded-full bg-[#FFF9F4] border border-[#A67C52]/18 transition text-[#4B3A22] hover:bg-[#FFF4EA]"
+                  aria-label="Panier"
+                >
+                  <ShoppingBag className="w-5 h-5" />
+                  {totalCartCount > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 inline-flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-[#8B3A52] text-[11px] font-black leading-none text-white shadow-[0_6px_16px_rgba(139,58,82,0.4)]">
+                      {totalCartCount}
+                    </span>
+                  )}
               </button>
             </div>
           </div>
         </div>
 
-        {/* BANDEAU ROSE CATÉGORIES */}
-        <div className="hidden md:block bg-[#C9607A]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center h-11 gap-1">
-
-              {/* Menu Toutes */}
-              <div className="relative" onMouseLeave={() => setCatMenuOpen(false)}>
+        <div
+          className="hidden md:block overflow-hidden transition-all duration-300 ease-in-out"
+          style={{
+            maxHeight: showDesktopCategoryBar && catBarVisible ? '56px' : '0px',
+            opacity: showDesktopCategoryBar && catBarVisible ? 1 : 0,
+          }}
+        >
+          <div style={{ background: 'linear-gradient(90deg, #8C6845 0%, #A67C52 100%)', borderTop: '1px solid rgba(255,255,255,0.12)' }}>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className={`flex items-center gap-1.5 transition-all duration-300 ${isScrolled ? 'h-10' : 'h-11'}`}>
                 <button
-                  onMouseEnter={() => setCatMenuOpen(true)}
-                  onClick={() => setCatMenuOpen(v => !v)}
-                  className="flex items-center gap-2 h-11 px-4 text-white font-bold text-xs uppercase tracking-wider hover:bg-white/10 transition"
+                  onClick={goToHome}
+                  className={`flex items-center gap-1.5 ${isScrolled ? 'h-9 px-3.5' : 'h-10 px-4'} text-[12px] font-semibold uppercase tracking-[0.18em] transition-all duration-200 whitespace-nowrap rounded-none border-b-2 ${
+                    !selectedCategoryId && currentView === 'shop'
+                      ? 'text-white border-white/80 bg-white/10'
+                      : 'text-white/80 border-transparent hover:text-white hover:bg-white/10 hover:border-white/40'
+                  }`}
+                  id="nav-cat-accueil"
                 >
-                  <Menu className="w-4 h-4" />
-                  <span>Toutes</span>
-                  <ChevronDown className="w-3 h-3" />
+                  <Home className="w-3.5 h-3.5" />
+                  <span>Accueil</span>
                 </button>
-                {catMenuOpen && (
-                  <div className="absolute top-full left-0 bg-white shadow-xl rounded-b-xl w-56 py-2 z-50 border-t-2 border-[#C9607A]">
-                    {categories.map(c => (
-                      <button key={c.slug} onClick={() => goToCategory(c.slug)}
-                        className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-[#FFF5F6] hover:text-[#C9607A] transition">
-                        {c.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
+
+                <div className="w-px h-5 bg-white/20 mx-1" />
+
+                {QUICK_CATS.map(link => (
+                  <button
+                    key={link.label}
+                    onClick={() => goToCategory(link.slug)}
+                    className={`transition-all duration-200 whitespace-nowrap border-b-2 ${isScrolled ? 'h-9 px-3 text-[12px]' : 'h-10 px-3.5 text-[12px]'} font-semibold uppercase tracking-[0.14em] ${
+                      selectedCategoryId === link.slug && currentView === 'shop'
+                        ? 'text-white border-white/80 bg-white/10'
+                        : 'text-white/80 border-transparent hover:text-white hover:bg-white/10 hover:border-white/40'
+                    }`}
+                  >
+                    {link.label}
+                  </button>
+                ))}
+
+                <div className="ml-auto" />
+
+                <button
+                  onClick={() => goTo('contact')}
+                  className={`border-b-2 border-transparent whitespace-nowrap text-white/80 hover:text-white hover:bg-white/10 text-[12px] font-medium uppercase tracking-[0.14em] transition-all duration-200 ${isScrolled ? 'h-9 px-3.5' : 'h-10 px-4'}`}
+                >
+                  Contact
+                </button>
               </div>
-
-              <div className="w-px h-5 bg-white/30" />
-
-              {[
-                { label: 'Packaging', slug: 'sacs-emballages-boutique' },
-                { label: 'Événementiel', slug: 'evenementiel' },
-                { label: 'Objets Publicitaires', slug: 'packaging-cadeaux' },
-                { label: 'Cadeaux Personnalisés', slug: 'parfumerie-cosmetique' },
-                { label: 'Emballages Alimentaires', slug: 'emballages-alimentaires' },
-              ].map(link => (
-                <button key={link.label} onClick={() => goToCategory(link.slug)}
-                  className="h-11 px-3 text-white/90 hover:text-white hover:bg-white/10 text-xs font-medium uppercase tracking-wide transition whitespace-nowrap">
-                  {link.label}
-                </button>
-              ))}
-
-              <button onClick={() => goTo('contact')}
-                className="h-11 px-3 text-white/90 hover:text-white hover:bg-white/10 text-xs font-medium uppercase tracking-wide transition whitespace-nowrap">
-                Contact
-              </button>
             </div>
           </div>
         </div>
       </header>
 
       {/* OVERLAY MOBILE */}
-      <div className={`fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300 ${mobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-        onClick={() => setMobileMenuOpen(false)} />
+      <div
+        className={`fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300 ${mobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        onClick={() => setMobileMenuOpen(false)}
+      />
 
       {/* DRAWER MOBILE */}
-      <div className={`fixed top-0 left-0 h-full w-72 bg-white z-50 md:hidden transform transition-transform duration-300 shadow-2xl overflow-y-auto ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="flex items-center justify-between p-4 bg-[#C9607A]">
-          <img src={logoImg} alt="Art de Table" className="w-8 h-8 object-contain" />
-          <span className="text-white font-bold uppercase tracking-widest text-sm">Menu</span>
-          <button onClick={() => setMobileMenuOpen(false)} className="w-8 h-8 flex items-center justify-center text-white">
+      <div
+        className={`fixed top-0 left-0 h-full w-80 bg-white text-[#2D2D2D] z-50 md:hidden transform transition-transform duration-300 shadow-2xl overflow-y-auto ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      >
+        {/* Header du drawer */}
+          <div
+            className="flex items-center justify-between p-5"
+            style={{ background: 'linear-gradient(90deg, #FFFFFF 0%, #FFF9F4 100%)', borderBottom: '1px solid rgba(166,124,82,0.12)' }}
+          >
+          <div className="flex items-center gap-2.5">
+            <img src={logoImg} alt="Art de Table" className="w-14 h-14 object-contain rounded-2xl bg-white p-1" />
+          </div>
+          <button
+            onClick={() => setMobileMenuOpen(false)}
+            className="w-9 h-9 flex items-center justify-center text-[#8C6845] hover:text-[#6F5337] transition rounded-full hover:bg-[#FFF4EA]"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
-        <div className="p-4">
-          <p className="text-[10px] uppercase tracking-widest text-gray-400 font-semibold mb-3 px-2">Catégories</p>
-          <div className="flex flex-col gap-1">
+
+        <div className="p-4 pb-8">
+          {/* Accueil */}
+          <button
+            onClick={goToHome}
+            className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm text-[#8C6845] font-semibold hover:bg-[#FFF5EC] transition mb-2"
+          >
+            <Home className="w-4 h-4" />
+            Accueil — Tout le catalogue
+          </button>
+
+          <p className="text-[10px] uppercase tracking-widest text-gray-400 font-semibold mb-2 px-3">Catégories</p>
+          <div className="flex flex-col gap-0.5">
             {categories.map(c => (
-              <button key={c.slug} onClick={() => goToCategory(c.slug)}
-                className="text-left px-3 py-2.5 rounded-lg text-sm text-gray-700 hover:bg-[#FFF5F6] hover:text-[#C9607A] transition font-medium">
-                {c.label}
-              </button>
+              <div key={c.slug} className="rounded-xl overflow-hidden">
+                <button
+                  onClick={() => goToCategory(c.slug)}
+                  className={`w-full text-left px-3 py-2.5 text-sm font-medium transition ${
+                    selectedCategoryId === c.slug
+                      ? 'bg-[#A67C52] text-white'
+                      : 'text-gray-700 hover:bg-[#FFF5EC] hover:text-[#8C6845]'
+                  }`}
+                >
+                  {c.label}
+                </button>
+                {c.subcategories?.length ? (
+                  <div className="px-3 pb-2 pt-0.5 flex flex-wrap gap-1.5">
+                    {c.subcategories.map(sub => (
+                      <span key={sub.slug} className="text-[10px] rounded-full bg-gray-50 text-gray-500 px-2 py-1">
+                        {sub.label}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
             ))}
           </div>
+
           <div className="border-t border-gray-100 mt-4 pt-4 flex flex-col gap-1">
-            <button onClick={() => goTo('about')} className="text-left px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition">À propos</button>
-            <button onClick={() => goTo('contact')} className="text-left px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition">Contact</button>
+            <button
+              onClick={() => goTo('about')}
+              className="text-left px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition"
+            >
+              À propos
+            </button>
+            <button
+              onClick={() => goTo('contact')}
+              className="text-left px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition"
+            >
+              Contact
+            </button>
             {currentUser ? (
               <>
-                <button onClick={() => { setView('dashboard'); setMobileMenuOpen(false); }}
-                  className="text-left px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition">Mon compte</button>
-                <button onClick={() => { logout(); setMobileMenuOpen(false); }}
-                  className="text-left px-3 py-2.5 rounded-lg text-sm text-red-500 hover:bg-red-50 transition">Déconnexion</button>
+                <button
+                  onClick={() => { setView('dashboard'); setMobileMenuOpen(false); }}
+                  className="text-left px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition"
+                >
+                  Mon compte
+                </button>
+                <button
+                  onClick={() => { logout(); setMobileMenuOpen(false); }}
+                  className="text-left px-3 py-2.5 rounded-lg text-sm text-red-500 hover:bg-red-50 transition"
+                >
+                  Déconnexion
+                </button>
               </>
             ) : (
-              <button onClick={() => { setView('login'); setMobileMenuOpen(false); }}
-                className="mt-2 w-full h-10 bg-[#C9607A] text-white text-xs uppercase tracking-widest font-bold rounded-lg">
+              <button
+                onClick={() => { setView('login'); setMobileMenuOpen(false); }}
+                className="mt-2 w-full h-11 text-white text-xs uppercase tracking-widest font-bold rounded-xl transition"
+                style={{ background: 'linear-gradient(90deg, #8C6845, #A67C52)' }}
+              >
                 Se connecter
               </button>
             )}
@@ -344,4 +563,4 @@ export const Navbar: React.FC = () => {
       </div>
     </>
   );
-}
+};

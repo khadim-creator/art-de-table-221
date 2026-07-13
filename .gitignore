@@ -6,3 +6,6 @@ coverage/
 *.log
 .env*
 !.env.example
+# Fichiers volumineux exclus de GitHub (>100MB)
+*.zip
+tmp/

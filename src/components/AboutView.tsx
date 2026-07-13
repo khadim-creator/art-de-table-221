@@ -1,13 +1,12 @@
 import React from 'react';
-import { Award, Compass, Heart, Leaf, Shield, CheckCircle2, Factory, Gem, Sparkles } from 'lucide-react';
-import { TestimonialsSection } from './TestimonialsSection';
+import { Award, Heart, CheckCircle2, Factory, Gem } from 'lucide-react';
 
 export const AboutView: React.FC = () => {
   return (
-    <main className="min-h-screen bg-[#FAF9F9] pt-32 text-left">
+    <main className="min-h-screen bg-transparent pt-6 md:pt-10 text-left">
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-24 bg-gradient-to-b from-[#FAF9F9] via-white to-[#FAF9F9]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <section className="relative overflow-hidden section-spacer bg-gradient-to-b from-[#FAF9F9] via-white to-[#FAF9F9]">
+        <div className="section-container relative z-10">
           <div className="max-w-3xl space-y-6">
             <span className="text-[10px] sm:text-xs font-mono uppercase tracking-widest text-[#D4AF37] font-bold py-1.5 px-4 bg-[#FDFBF7] rounded-full border border-[#F3E5AB]">
               Qui sommes-nous ?
@@ -24,8 +23,8 @@ export const AboutView: React.FC = () => {
       </section>
 
       {/* Storytelling & Dakar Teranga Section */}
-      <section className="py-16 bg-white border-y border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="section-spacer bg-white border-y border-gray-100">
+        <div className="section-container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             
             {/* Left Narrative */}
@@ -73,8 +72,8 @@ export const AboutView: React.FC = () => {
       </section>
 
       {/* Mission, Vision, Values Block */}
-      <section className="py-20 bg-[#FAF9F9]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="section-spacer bg-transparent">
+        <div className="section-container">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             
             {/* Mission Card */}
@@ -115,8 +114,8 @@ export const AboutView: React.FC = () => {
       </section>
 
       {/* Why Choose Us Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="section-spacer bg-white">
+        <div className="section-container">
           <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
             <h2 className="text-3xl font-serif font-bold text-[#2D2D2D]">Pourquoi Choisir la Maison Art de Table ?</h2>
             <p className="text-sm text-gray-400 font-light">
@@ -203,8 +202,8 @@ export const AboutView: React.FC = () => {
       </section>
 
       {/* Workshop Gallery Section */}
-      <section className="py-20 bg-gray-50 border-t border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="section-spacer bg-gray-50 border-t border-gray-100">
+        <div className="section-container">
           <div className="text-center max-w-2xl mx-auto space-y-4 mb-16">
             <span className="text-[10px] font-mono tracking-widest text-[#D4AF37] uppercase font-bold flex items-center justify-center space-x-1">
               <Factory className="w-4 h-4" />
@@ -266,8 +265,6 @@ export const AboutView: React.FC = () => {
         </div>
       </section>
 
-      {/* Testimonials at the bottom for commercial traction */}
-      <TestimonialsSection />
     </main>
   );
 };

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { Trash2, AlertCircle, Sparkles, CheckCircle2, ShoppingCart, User, Landmark, HelpCircle } from 'lucide-react';
-import { ProductMockup } from './ProductMockup';
 
 export const CartView: React.FC = () => {
   const { 
@@ -25,6 +24,13 @@ export const CartView: React.FC = () => {
   const [promoInput, setPromoInput] = useState('');
   const [promoError, setPromoError] = useState(false);
   const [promoSuccess, setPromoSuccess] = useState(false);
+  const [orderConfirmation, setOrderConfirmation] = useState<{
+    id: string;
+    totalAmount: number;
+    customerName: string;
+    deliveryLabel: string;
+    paymentLabel: string;
+  } | null>(null);
 
   // Shipping form state
   const [shippingDetails, setShippingDetails] = useState({
@@ -47,6 +53,12 @@ export const CartView: React.FC = () => {
     }
   }, [currentUser]);
 
+  React.useEffect(() => {
+    if (cart.length > 0 && orderConfirmation) {
+      setOrderConfirmation(null);
+    }
+  }, [cart.length, orderConfirmation]);
+
   const handleApplyPromo = (e: React.FormEvent) => {
     e.preventDefault();
     if (!promoInput.trim()) return;
@@ -64,11 +76,6 @@ export const CartView: React.FC = () => {
   const handleOrderSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (cart.length === 0) return;
-    
-    if (!currentUser) {
-      setView('login');
-      return;
-    }
 
     if (!shippingDetails.name || !shippingDetails.phone || !shippingDetails.address) {
       alert("Veuillez remplir les informations obligatoires de livraison (Nom, Téléphone, Adresse).");
@@ -77,7 +84,17 @@ export const CartView: React.FC = () => {
 
     try {
       setCheckoutLoading(true);
-      await placeOrder(shippingDetails);
+      const order = await placeOrder(shippingDetails);
+      setOrderConfirmation({
+        id: order.id,
+        totalAmount: order.totalAmount,
+        customerName: order.name,
+        deliveryLabel: order.deliveryMethod === 'livraison' ? 'Livraison à domicile' : 'Retrait en boutique',
+        paymentLabel:
+          order.paymentMethod === 'wave' ? 'Wave' :
+          order.paymentMethod === 'orange_money' ? 'Orange Money' :
+          'Paiement à la livraison',
+      });
     } catch (err) {
       console.error(err);
     } finally {
@@ -85,40 +102,101 @@ export const CartView: React.FC = () => {
     }
   };
 
+  if (orderConfirmation) {
+    return (
+      <main className="min-h-screen bg-transparent flex items-center justify-center text-left">
+        <div className="section-container section-spacer flex justify-center">
+          <div className="w-full max-w-2xl rounded-[2rem] border border-[#A67C52]/18 bg-white p-8 sm:p-10 shadow-sm">
+            <div className="flex items-start gap-4">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#F0FDF4] text-[#15803D] border border-[#15803D]/10">
+                <CheckCircle2 className="h-7 w-7" />
+              </div>
+              <div className="space-y-2">
+                <p className="text-[10px] font-mono uppercase tracking-[0.28em] text-[#A67C52]">
+                  Commande validée
+                </p>
+                <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#2D2D2D]">
+                  Merci {orderConfirmation.customerName}
+                </h2>
+                <p className="text-sm text-stone-500 leading-relaxed">
+                  Votre commande a été enregistrée. Une confirmation WhatsApp a été préparée et vous pouvez suivre la prise en charge avec la référence ci-dessous.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 grid gap-3 rounded-[1.5rem] bg-[#FFF9F4] p-5 sm:grid-cols-3">
+              <div>
+                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400">Référence</div>
+                <div className="mt-1 font-mono text-sm font-bold text-[#2D2D2D]">{orderConfirmation.id.slice(0, 8).toUpperCase()}</div>
+              </div>
+              <div>
+                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400">Livraison</div>
+                <div className="mt-1 text-sm font-semibold text-[#2D2D2D]">{orderConfirmation.deliveryLabel}</div>
+              </div>
+              <div>
+                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400">Total</div>
+                <div className="mt-1 text-sm font-semibold text-[#8C6845]">{orderConfirmation.totalAmount.toLocaleString()} FCFA</div>
+              </div>
+            </div>
+
+            <div className="mt-6 flex flex-col sm:flex-row gap-3">
+              <button
+                id="order-confirmation-shop-btn"
+                onClick={() => setView('shop')}
+                className="btn-primary h-12 px-5 text-xs uppercase tracking-widest"
+              >
+                Continuer mes achats
+              </button>
+              <button
+                id="order-confirmation-home-btn"
+                onClick={() => setView('home')}
+                className="inline-flex items-center justify-center rounded-full border border-[#A67C52]/18 bg-[#FFF9F4] px-5 h-12 text-xs font-semibold uppercase tracking-widest text-[#4B3A22] transition hover:bg-[#FFF4EA]"
+              >
+                Retour à l’accueil
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   if (cart.length === 0) {
     return (
-      <main className="min-h-screen bg-[#FAF9F9] pt-32 pb-24 flex items-center justify-center text-left">
-        <div className="max-w-md w-full mx-auto px-4 text-center space-y-6">
+      <main className="min-h-screen bg-transparent flex items-center justify-center text-left">
+        <div className="section-container section-spacer flex justify-center text-center space-y-6">
+          <div className="max-w-md w-full">
           <div className="w-20 h-20 bg-[#FDF2F2] rounded-full flex items-center justify-center mx-auto text-[#E8A5A5] border border-[#E8A5A5]/10 animate-pulse">
             <ShoppingCart className="w-8 h-8" />
           </div>
           <div className="space-y-2">
             <h2 className="font-serif text-2xl font-bold text-[#2D2D2D]">Votre Panier est vide</h2>
             <p className="text-xs sm:text-sm text-gray-400 font-light max-w-sm mx-auto">
-              Retrouvez nos magnifiques boîtes, flacons, sacs de luxe et étiquettes et créez votre personnalisation sur-mesure dès maintenant.
+              Découvrez nos boîtes, flacons, sacs et étiquettes puis composez votre sélection.
             </p>
           </div>
           <button
             id="empty-cart-back-btn"
             onClick={() => setView('shop')}
-            className="inline-flex bg-[#2D2D2D] hover:bg-black text-white text-xs uppercase tracking-widest font-semibold px-8 py-3.5 rounded-full shadow transition"
+            className="btn-primary inline-flex text-xs uppercase tracking-widest px-8 py-3.5"
           >
-            Découvrir le Catalogue
+            Découvrir le catalogue
           </button>
+          </div>
         </div>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[#FAF9F9] pt-32 pb-24 text-left">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-transparent text-left">
+      <div className="section-container section-spacer">
         
         {/* Title */}
         <div className="mb-12">
           <h1 className="text-3xl sm:text-4xl font-serif font-bold text-[#2D2D2D]">Votre Panier de Personnalisation</h1>
           <p className="text-xs text-gray-500 font-light mt-1">
-            Gérez vos contenants personnalisés, appliquez vos remises, et complétez votre commande vers WhatsApp et nos registres d'entrepôt Dakar.
+            Gérez vos contenants personnalisés, appliquez vos remises, et validez votre commande en quelques étapes.
           </p>
         </div>
 
@@ -139,9 +217,12 @@ export const CartView: React.FC = () => {
                   <div className="flex items-center space-x-4">
                     {/* Item Image */}
                     <div className="w-14 h-14 rounded-xl border overflow-hidden bg-pink-50/10 shrink-0">
-                      <ProductMockup
-                        productId={item.product.id}
-                        className="w-full h-full"
+                      <img
+                        src={item.product.images?.[0] || 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=600'}
+                        alt={item.product.name}
+                        className="h-full w-full object-cover"
+                        loading="lazy"
+                        referrerPolicy="no-referrer"
                       />
                     </div>
 
@@ -172,7 +253,7 @@ export const CartView: React.FC = () => {
                     
                     <div className="flex items-center space-x-2 bg-gray-50 rounded-lg p-1">
                       <button
-                        onClick={() => updateCartQuantity(item.product.id, item.customInstructions, item.quantity - 10)}
+                        onClick={() => updateCartQuantity(item.product.id, item.customInstructions, item.quantity - 1)}
                         className="w-7 h-7 text-[#E8A5A5] font-mono font-bold flex items-center justify-center text-xs"
                       >
                         -
@@ -181,7 +262,7 @@ export const CartView: React.FC = () => {
                         {item.quantity}
                       </span>
                       <button
-                        onClick={() => updateCartQuantity(item.product.id, item.customInstructions, item.quantity + 10)}
+                        onClick={() => updateCartQuantity(item.product.id, item.customInstructions, item.quantity + 1)}
                         className="w-7 h-7 text-[#E8A5A5] font-mono font-bold flex items-center justify-center text-xs"
                       >
                         +
@@ -191,7 +272,7 @@ export const CartView: React.FC = () => {
                     <div className="text-right">
                       <p className="text-xs text-gray-405 font-mono">SOUS-TOTAL</p>
                       <p className="text-[#2D2D2D] font-serif font-bold text-sm">
-                        {(item.quantity * item.product.price).toLocaleString()} FCFA
+                        {(item.quantity * (item.configuredPrice ?? item.product.price)).toLocaleString()} FCFA
                       </p>
                     </div>
 
@@ -243,12 +324,12 @@ export const CartView: React.FC = () => {
                     value={promoInput}
                     onChange={e => setPromoInput(e.target.value)}
                     placeholder="Ex: TERANGA15, SOUMAY20..."
-                    className="flex-1 px-4 py-4 bg-gray-50 rounded-xl text-base border border-transparent focus:border-[#E8A5A5] outline-none transition uppercase font-mono h-12"
+                    className="form-input flex-1 uppercase font-mono h-12"
                   />
                   <button
                     id="cart-apply-promo-btn"
                     type="submit"
-                    className="bg-[#2D2D2D] hover:bg-black text-white px-6 h-12 rounded-xl text-xs uppercase tracking-widest font-semibold transition cursor-pointer"
+                    className="btn-primary px-6 h-12 text-xs uppercase tracking-widest"
                   >
                     Valider
                   </button>
@@ -257,7 +338,7 @@ export const CartView: React.FC = () => {
 
               {promoError && (
                 <p className="text-[11px] text-red-500 font-light flex items-center space-x-1">
-                  <AlertCircle className="w-3.5 h-3.5" />
+                  <AlertCircle className="icon-sm" />
                   <span>Code invalide, expiré ou inactif.</span>
                 </p>
               )}
@@ -275,7 +356,7 @@ export const CartView: React.FC = () => {
 
               {/* Delivery method selector */}
               <div className="space-y-2">
-                <label className="text-[10px] font-mono uppercase tracking-widest text-gray-400 font-bold block">
+                <label className="form-label">
                   Mode de livraison
                 </label>
                 <div className="grid grid-cols-2 gap-4">
@@ -310,9 +391,9 @@ export const CartView: React.FC = () => {
               </div>
 
               {/* Shipping fields */}
-              <div className="space-y-4 pt-2">
-                <div className="space-y-1 text-left">
-                  <label className="text-[9px] font-mono uppercase tracking-widest text-gray-400 font-bold block">
+              <div className="space-y-4 pt-2 text-left">
+                <div className="space-y-1">
+                  <label className="form-label">
                     Nom Complet du destinataire *
                   </label>
                   <input
@@ -322,12 +403,12 @@ export const CartView: React.FC = () => {
                     value={shippingDetails.name}
                     onChange={e => setShippingDetails({ ...shippingDetails, name: e.target.value })}
                     placeholder="Ex: Seynabou Sow"
-                    className="w-full px-4 py-4 bg-gray-50 rounded-xl text-base border border-transparent focus:border-[#E8A5A5] focus:bg-white outline-none transition h-12"
+                    className="form-input"
                   />
                 </div>
 
-                <div className="space-y-1 text-left">
-                  <label className="text-[9px] font-mono uppercase tracking-widest text-gray-400 font-bold block">
+                <div className="space-y-1">
+                  <label className="form-label">
                     Numéro de Téléphone sénégalais *
                   </label>
                   <input
@@ -337,12 +418,12 @@ export const CartView: React.FC = () => {
                     value={shippingDetails.phone}
                     onChange={e => setShippingDetails({ ...shippingDetails, phone: e.target.value })}
                     placeholder="Ex: 77 123 45 67"
-                    className="w-full px-4 py-4 bg-gray-50 rounded-xl text-base border border-transparent focus:border-[#E8A5A5] focus:bg-white outline-none transition h-12"
+                    className="form-input"
                   />
                 </div>
 
-                <div className="space-y-1 text-left">
-                  <label className="text-[9px] font-mono uppercase tracking-widest text-gray-400 font-bold block">
+                <div className="space-y-1">
+                  <label className="form-label">
                     Adresse de livraison complète *
                   </label>
                   <input
@@ -352,12 +433,12 @@ export const CartView: React.FC = () => {
                     value={shippingDetails.address}
                     onChange={e => setShippingDetails({ ...shippingDetails, address: e.target.value })}
                     placeholder="Ex: Dakar, Point E, Rue de la Résidence, Villa 12"
-                    className="w-full px-4 py-4 bg-gray-50 rounded-xl text-base border border-transparent focus:border-[#E8A5A5] focus:bg-white outline-none transition h-12"
+                    className="form-input"
                   />
                 </div>
 
-                <div className="space-y-1 text-left">
-                  <label className="text-[9px] font-mono uppercase tracking-widest text-gray-400 font-bold block">
+                <div className="space-y-1">
+                  <label className="form-label">
                     Adresse Courriel (Email)
                   </label>
                   <input
@@ -366,14 +447,14 @@ export const CartView: React.FC = () => {
                     value={shippingDetails.email}
                     onChange={e => setShippingDetails({ ...shippingDetails, email: e.target.value })}
                     placeholder="Ex: seynabou@gmail.com"
-                    className="w-full px-4 py-4 bg-gray-50 rounded-xl text-base border border-transparent focus:border-[#E8A5A5] focus:bg-white outline-none transition h-12"
+                    className="form-input"
                   />
                 </div>
               </div>
 
               {/* Payment Selectors */}
               <div className="space-y-2 pt-2">
-                <label className="text-[10px] font-mono uppercase tracking-widest text-gray-400 font-bold block">
+                <label className="form-label">
                   Méthode de paiement locale
                 </label>
                 <div className="grid grid-cols-3 gap-3">
@@ -457,29 +538,18 @@ export const CartView: React.FC = () => {
                   id="cart-submit-order-btn"
                   type="submit"
                   disabled={checkoutLoading}
-                  className="w-full bg-[#E8A5A5] hover:bg-[#de9393] text-white text-xs uppercase tracking-widest font-semibold h-12 rounded-xl flex items-center justify-center space-x-2 transition-colors cursor-pointer shadow-sm"
+                  className="btn-primary w-full h-12 uppercase tracking-widest text-xs flex items-center justify-center space-x-2"
                 >
                   {checkoutLoading ? (
-                    <span>Veuillez patienter... Enregistrement</span>
+                    <span>Veuillez patienter...</span>
                   ) : (
                     <>
-                      <ShoppingCart className="w-4 h-4" />
-                      <span>Passer ma commande via WhatsApp</span>
+                      <ShoppingCart className="icon-sm" />
+                      <span>Commander</span>
                     </>
                   )}
                 </button>
                 
-                {!currentUser && (
-                  <div className="text-center pt-4">
-                    <button
-                      type="button"
-                      onClick={() => setView('login')}
-                      className="text-[11px] uppercase tracking-wider text-stone-500 hover:text-[#E8A5A5] transition-colors"
-                    >
-                      Pour suivre vos commandes sur-mesure, connectez-vous ici
-                    </button>
-                  </div>
-                )}
               </div>
 
             </form>

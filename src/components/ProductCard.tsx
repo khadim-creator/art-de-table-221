@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
-import { Heart, ArrowRight } from 'lucide-react';
+import React from 'react';
+import { ShoppingCart } from 'lucide-react';
 import { Product } from '../types';
+import { useApp } from '../context/AppContext';
 
 interface ProductCardProps {
   product: Product;
@@ -10,144 +10,73 @@ interface ProductCardProps {
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, onClick, idx }) => {
-  // Favorite state backed by LocalStorage
-  const [isFavorite, setIsFavorite] = useState(false);
+  const { addToCart, selectedProductId } = useApp();
+  const productPrice = Number.isFinite(product.price) ? product.price : 0;
+  const minQty = Number.isFinite(product.minQty) ? product.minQty : 1;
+  const productName = product.name || 'Produit';
+  const productImage = Array.isArray(product.images) && product.images[0]
+    ? product.images[0]
+    : 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=600';
+  const isSelected = selectedProductId === product.id;
 
-  useEffect(() => {
-    try {
-      const savedFavs = localStorage.getItem('art_table_favorites');
-      if (savedFavs) {
-        const parsed = JSON.parse(savedFavs) as string[];
-        setIsFavorite(parsed.includes(product.id));
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }, [product.id]);
-
-  const toggleFavorite = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Avoid triggering card click
-    try {
-      const savedFavs = localStorage.getItem('art_table_favorites');
-      let parsed: string[] = [];
-      if (savedFavs) {
-        parsed = JSON.parse(savedFavs) as string[];
-      }
-      if (parsed.includes(product.id)) {
-        parsed = parsed.filter(id => id !== product.id);
-        setIsFavorite(false);
-      } else {
-        parsed.push(product.id);
-        setIsFavorite(true);
-      }
-      localStorage.setItem('art_table_favorites', JSON.stringify(parsed));
-    } catch (err) {
-      console.error(err);
-    }
+  const handleQuickAdd = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    addToCart(product, minQty, '', '', product.price);
   };
 
   return (
-    <motion.div
+    <div
       id={`product-card-${product.id}`}
       onClick={onClick}
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ 
-        delay: idx * 0.03, 
-        duration: 0.4, 
-        ease: "easeOut" 
-      }}
-      whileHover={{ 
-        y: -4,
-        transition: { duration: 0.2, ease: "easeOut" }
-      }}
-      className="group cursor-pointer bg-white rounded-2xl overflow-hidden border border-stone-100 flex flex-col justify-between relative shadow-sm hover:shadow-md transition-all duration-300"
+      className={`group relative flex h-full transform-gpu cursor-pointer flex-col overflow-hidden rounded-[1.5rem] border bg-white shadow-sm transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_18px_45px_rgba(166,124,82,0.08)] ${
+        isSelected ? 'border-[#A67C52]/35 ring-1 ring-[#A67C52]/20 shadow-[0_18px_45px_rgba(166,124,82,0.12)]' : 'border-white/80'
+      }`}
     >
-      {/* 1. PRODUCT PHOTO ZONE */}
-      <div className="relative w-full aspect-square overflow-hidden bg-[#FAF6F6] flex items-center justify-center">
+      {/* 1. IMAGE */}
+      <div className="relative w-full aspect-square overflow-hidden bg-[#FAF6F6]">
         <img
-          src={product.images && product.images[0] ? product.images[0] : 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=600'}
-          alt={product.name}
+          src={productImage}
+          alt={productName}
           referrerPolicy="no-referrer"
-          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
+          className="absolute inset-0 h-full w-full transform-gpu object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03]"
         />
-        {/* Soft elegant overlay */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-all duration-300 pointer-events-none" />
+        {/* Overlay on hover */}
+        <div className="absolute inset-0 bg-black/0 transition-all duration-300 group-hover:bg-black/6 pointer-events-none" />
 
-        {/* 2. MINIMALIST BADGE "PERSONNALISABLE" & STOCK DETAILS */}
-        {product.isCustomizable && (
-          <div className="absolute top-3 left-3 z-10">
-            <div className="bg-[#E8A5A5] text-white text-[8px] font-medium tracking-widest uppercase px-2.5 py-1 rounded-md shadow-sm">
-              Personnalisable
-            </div>
-          </div>
-        )}
-
-        {/* Min Qty indicator badge bottom right */}
-        <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded text-[8px] font-mono tracking-wider text-stone-600 border border-stone-100">
-          Min. {product.minQty} pcs
+        {/* Min Qty badge */}
+        <div className="absolute bottom-2 right-2 bg-white/92 backdrop-blur-sm px-2 py-0.5 rounded text-[8px] font-mono tracking-wider text-[#8C6845] border border-[#A67C52]/10">
+          Min. {minQty} pcs
         </div>
+
+        <button
+          id={`quick-add-btn-${product.id}`}
+          onClick={handleQuickAdd}
+          className="absolute inset-x-3 bottom-3 z-20 btn-primary h-11 px-4 text-[10px] uppercase tracking-[0.18em] whitespace-nowrap shadow-[0_12px_25px_rgba(140,104,69,0.18)] opacity-0 translate-y-4 pointer-events-none transition-[transform,opacity] duration-200 ease-out md:group-hover:opacity-100 md:group-hover:translate-y-0 md:group-hover:pointer-events-auto"
+        >
+          <ShoppingCart className="icon-sm" />
+          <span>Ajouter au panier</span>
+        </button>
       </div>
 
-      {/* 3. CARD INFORMATION ZONE */}
-      <div className="p-4 flex-grow flex flex-col justify-between text-left">
-        
-        <div className="space-y-1">
-          {/* Category */}
-          <p className="text-[9px] font-mono uppercase tracking-widest text-[#C08A8A]">
-            {product.category.replace(/-/g, ' ')}
-          </p>
-
-          {/* Product Name */}
-          <h3 className="font-serif text-sm font-medium text-stone-900 group-hover:text-[#E8A5A5] transition-colors leading-tight line-clamp-2 min-h-[36px]">
-            {product.name}
+      {/* 2. INFO ZONE */}
+      <div className="flex h-[6.1rem] flex-none flex-col justify-between p-4 text-left sm:h-[6.4rem] sm:p-5">
+        <div className="flex h-full flex-col justify-center gap-1">
+          <h3
+            className="min-w-0 truncate font-display italic text-[1.08rem] sm:text-[1.15rem] font-semibold leading-[1.05] tracking-[-0.02em] text-[#2A1B13] transition-colors group-hover:text-[#8C6845]"
+            title={productName}
+          >
+            {productName}
           </h3>
 
-          {/* Short description */}
-          <p className="text-[11px] text-stone-500 font-light leading-relaxed line-clamp-1">
-            {product.description}
-          </p>
-        </div>
-
-        {/* 4. BUTTONS BAR */}
-        <div className="mt-3 pt-3 border-t border-stone-50 flex flex-col space-y-2 mt-auto">
-          
-          <div className="flex items-center justify-between">
-            <span className="text-[8px] font-mono tracking-wider text-stone-400">PRIX DE RÉFÉRENCE</span>
-            <span className="text-stone-900 font-serif text-xs font-semibold">
-              {product.price.toLocaleString()} <span className="text-[8px] font-sans font-normal text-stone-500">FCFA</span>
+          <div className="shrink-0">
+            <span className="block text-[8px] sm:text-[9px] font-mono uppercase tracking-[0.2em] text-[#8B6C52]">Prix</span>
+            <span className="block whitespace-nowrap font-display italic text-[1.08rem] sm:text-[1.15rem] leading-none font-semibold text-[#8C6845]">
+              {productPrice.toLocaleString()} <span className="text-[0.72em] font-sans font-medium tracking-[0.16em] text-[#A98B72]">FCFA</span>
             </span>
           </div>
-
-          <div className="grid grid-cols-12 gap-2" onClick={(e) => e.stopPropagation()}>
-            {/* ♡ Favoris Button */}
-            <button
-              id={`fav-btn-${product.id}`}
-              onClick={toggleFavorite}
-              className={`col-span-4 flex items-center justify-center py-2.5 rounded-lg border transition-colors ${
-                isFavorite 
-                  ? 'bg-[#FAF0F0] border-[#E8A5A5] text-[#C08A8A]' 
-                  : 'bg-white border-stone-100 text-stone-400 hover:text-[#C08A8A] hover:bg-stone-50'
-              }`}
-            >
-              <Heart className={`w-3.5 h-3.5 ${isFavorite ? 'fill-[#C08A8A]' : ''}`} />
-            </button>
-
-            {/* Commencer devis Button */}
-            <button
-              id={`quote-btn-${product.id}`}
-              onClick={onClick}
-              className="col-span-8 flex items-center justify-center space-x-1 py-2.5 rounded-lg text-[10px] uppercase font-semibold tracking-wider bg-[#1A1A1A] hover:bg-[#E8A5A5] text-white transition-colors cursor-pointer"
-            >
-              <span>Personnaliser</span>
-              <ArrowRight className="w-3 h-3" />
-            </button>
-          </div>
-
         </div>
-
       </div>
-    </motion.div>
+    </div>
   );
 };

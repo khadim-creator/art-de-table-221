@@ -1,6 +1,4 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { collection, onSnapshot } from 'firebase/firestore';
-import { db } from '../lib/firebase';
 import { useApp } from '../context/AppContext';
 import { ProductMockup } from './ProductMockup';
 import { AdminMediaLibrary } from './AdminMediaLibrary';
@@ -17,19 +15,23 @@ export const AdminDashboardView: React.FC = () => {
   const { 
     currentUser, 
     orders, 
-    quotes, 
-    products, 
+    quotes,
+    products,
     categories,
+    testimonials,
     promotions,
     stockHistory,
+    siteSettings,
     setView,
     adminUpdateOrderStatus,
     adminUpdateQuoteStatus,
     adminAddProduct,
     adminEditProduct,
     adminDeleteProduct,
+    adminEditCategory,
     adminClearAllProducts,
     adminReseedCatalog,
+    adminImportBackup,
     loginWithEmail,
     logout
   } = useApp();
@@ -52,27 +54,33 @@ export const AdminDashboardView: React.FC = () => {
   const [adminMediaItems, setAdminMediaItems] = useState<any[]>([]);
 
   useEffect(() => {
-    try {
-      const unsub = onSnapshot(collection(db, 'media'), (snapshot) => {
-        const items = snapshot.docs.map(doc => ({ id: doc.id, url: doc.data().url, name: doc.data().name || 'Fichier' }));
-        setAdminMediaItems(items);
-      }, (err) => {
-        const offlineMedia = localStorage.getItem('art_table_demo_media_items');
-        if (offlineMedia) {
-          try {
-            setAdminMediaItems(JSON.parse(offlineMedia));
-          } catch(e){}
-        }
-      });
-      return () => unsub();
-    } catch(err) {
-      const offlineMedia = localStorage.getItem('art_table_demo_media_items');
-      if (offlineMedia) {
+    const loadMedia = () => {
+      const saved = localStorage.getItem('art_table_media_items');
+      if (saved) {
         try {
-          setAdminMediaItems(JSON.parse(offlineMedia));
-        } catch(e){}
+          setAdminMediaItems(JSON.parse(saved));
+        } catch (e) {}
+      } else {
+        const demo = localStorage.getItem('art_table_demo_media_items');
+        if (demo) {
+          try {
+            setAdminMediaItems(JSON.parse(demo));
+          } catch (e) {}
+        }
       }
-    }
+    };
+
+    loadMedia();
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'art_table_media_items' && e.newValue) {
+        try {
+          setAdminMediaItems(JSON.parse(e.newValue));
+        } catch (e) {}
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   // Product Form helpers
@@ -196,9 +204,7 @@ export const AdminDashboardView: React.FC = () => {
     const updated = [newReel, ...adminReels];
     setAdminReels(updated);
     localStorage.setItem('art_table_reels', JSON.stringify(updated));
-    
-    // Broadcast update across frames/windows
-    window.dispatchEvent(new Event('art_table_reels_updated'));
+    window.dispatchEvent(new Event('art_table_sync'));
     
     setNewReelForm({
       title: '',
@@ -214,7 +220,7 @@ export const AdminDashboardView: React.FC = () => {
     const updated = adminReels.filter(r => r.id !== reelId);
     setAdminReels(updated);
     localStorage.setItem('art_table_reels', JSON.stringify(updated));
-    window.dispatchEvent(new Event('art_table_reels_updated'));
+    window.dispatchEvent(new Event('art_table_sync'));
     alert("Vidéo retirée.");
   };
   
@@ -228,6 +234,11 @@ export const AdminDashboardView: React.FC = () => {
     contactPhone: '+221 77 871 58 75',
     contactAddress: 'Jardin Ouagou Niayes, côté marché HLM, Dakar, Sénégal'
   });
+  const [categoryImageDrafts, setCategoryImageDrafts] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    setCategoryImageDrafts(Object.fromEntries(categories.map(cat => [cat.id, cat.image || ''])));
+  }, [categories]);
 
   // KPI Calculations
   const stats = useMemo(() => {
@@ -295,9 +306,9 @@ export const AdminDashboardView: React.FC = () => {
 
     try {
       await adminUpdateQuoteStatus(
-        quoteId, 
-        'modifie', 
-        response.offerAmount, 
+        quoteId,
+        'approuve' as any,
+        response.offerAmount,
         response.notes || "Offre d'atelier validée pour dorage à chaud."
       );
       alert("La cotation a été enregistrée et transmise à l'Espace Client !");
@@ -344,7 +355,7 @@ export const AdminDashboardView: React.FC = () => {
     };
 
     try {
-      await adminUpdateQuoteStatus(quote.id, "accepte", finalPrice, "Transformé en commande physique d'atelier.");
+      await adminUpdateQuoteStatus(quote.id, "approuve" as any, finalPrice, "Transformé en commande physique d'atelier.");
       alert(`Félicitations ! Le devis de ${quote.name} a été transformé avec succès en une commande d'atelier en production d'une valeur de ${(finalPrice * quote.targetQuantity).toLocaleString()} FCFA !`);
     } catch (err) {
       alert("Impossible de compléter la conversion.");
@@ -373,7 +384,12 @@ export const AdminDashboardView: React.FC = () => {
         stock: productForm.stock,
         rating: 5,
         reviewsCount: 0,
-        videoUrl: productForm.videoUrl || ''
+        videoUrl: productForm.videoUrl || '',
+        // Champs requis par le type Product (définis au moment de l'ajout)
+        produit_mis_en_avant: false,
+        disponibilite: productForm.stock > 0 ? 'en_stock' : 'rupture',
+        date_creation: new Date().toISOString(),
+        date_modification: new Date().toISOString()
       });
       setIsAddingProduct(false);
       setProductForm({ name: '', price: 1500, category: 'evenementiel', description: '', minQty: 100, productionDelay: '7-10 jours', imageUrl: '', images: [], stock: 1000, videoUrl: '' });
@@ -593,6 +609,62 @@ export const AdminDashboardView: React.FC = () => {
     } catch (err) {
       alert("Erreur lors de la suppression des produits du catalogue.");
     }
+  };
+
+  const handleExportJSON = () => {
+    try {
+      const backupData = {
+        products,
+        categories,
+        testimonials,
+        promotions,
+        orders,
+        quotes,
+        stockHistory,
+        siteSettings,
+        mediaItems: JSON.parse(localStorage.getItem('art_table_media_items') || '[]'),
+        registeredUsers: JSON.parse(localStorage.getItem('art_table_registered_users') || '[]'),
+        reels: JSON.parse(localStorage.getItem('art_table_reels') || '[]'),
+        version: 'v1_backup',
+        timestamp: new Date().toISOString()
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `art_de_table_backup_${new Date().toISOString().slice(0, 10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    } catch (err) {
+      console.error(err);
+      alert("Erreur lors de l'exportation des données.");
+    }
+  };
+
+  const handleImportJSON = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const isConfirmed = window.confirm("ATTENTION: L'importation de ce fichier va écraser TOUTES vos données actuelles (produits, catégories, commandes, médiathèque, etc.). Confirmez-vous ?");
+    if (!isConfirmed) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const json = JSON.parse(e.target?.result as string);
+        adminImportBackup(json)
+          .then(() => alert("Données importées avec succès et synchronisées avec le site client !"))
+          .catch((err) => {
+            console.error(err);
+            alert("Impossible d'importer les données dans la base live.");
+          });
+      } catch (err) {
+        console.error(err);
+        alert("Fichier JSON invalide. Impossible de restaurer les données.");
+      }
+    };
+    reader.readAsText(file);
   };
 
   // Filter functions
@@ -2083,7 +2155,7 @@ export const AdminDashboardView: React.FC = () => {
                           <h4 className="font-serif text-lg font-bold text-[#2D2D2D]">Cahier des charges #{q.id.slice(0, 8).toUpperCase()}</h4>
                         </div>
                         <span className={`text-[10px] font-mono uppercase font-bold py-1 px-3 rounded-full ${
-                          q.status === 'accepte' ? 'bg-green-50 text-green-700' :
+                          q.status === 'approuve' ? 'bg-green-50 text-green-700' :
                           q.status === 'refuse' ? 'bg-red-50 text-red-700' :
                           q.status === 'modifie' ? 'bg-blue-50 text-blue-700 animate-pulse' :
                           'bg-yellow-50 text-yellow-850'
@@ -2119,7 +2191,7 @@ export const AdminDashboardView: React.FC = () => {
                       </div>
 
                       {/* Eval and chiffrage form */}
-                      {q.status !== 'accepte' ? (
+                      {q.status !== 'approuve' ? (
                         <div className="pt-4 border-t border-dashed border-stone-200 space-y-4">
                           <div className="flex items-center space-x-2 text-xs font-bold text-neutral-800">
                             <ArrowRight className="w-4 h-4 text-[#D4AF37]" />
@@ -2339,76 +2411,107 @@ export const AdminDashboardView: React.FC = () => {
               </div>
             </form>
 
+            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-stone-200/50 shadow-sm space-y-6 text-left border-t-2 border-t-[#D4AF37]">
+              <div className="space-y-1 border-b border-stone-100 pb-4">
+                <h3 className="font-serif text-lg font-bold text-neutral-900">Bannières des catégories</h3>
+                <p className="text-xs text-stone-400 font-light">Chaque image alimente la grande bannière de la boutique lorsqu’une catégorie est sélectionnée.</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {categories.map((cat) => (
+                  <div key={cat.id} className="rounded-2xl border border-stone-200 bg-[#FAF9F6] p-4 space-y-3">
+                    <div className="flex items-start gap-3">
+                      <img
+                        src={categoryImageDrafts[cat.id] || cat.image || 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&q=80&w=900'}
+                        alt={cat.name}
+                        className="w-20 h-20 rounded-xl object-cover border border-white shadow-sm shrink-0"
+                      />
+                      <div className="min-w-0">
+                        <p className="font-semibold text-sm text-neutral-900">{cat.name}</p>
+                        <p className="text-[11px] text-stone-400">Image de bannière modifiable</p>
+                      </div>
+                    </div>
+
+                    <input
+                      type="text"
+                      value={categoryImageDrafts[cat.id] ?? cat.image ?? ''}
+                      onChange={(e) => setCategoryImageDrafts(prev => ({ ...prev, [cat.id]: e.target.value }))}
+                      className="w-full p-3 border border-stone-200 rounded-xl outline-none focus:border-[#D4AF37] bg-white text-xs"
+                      placeholder="Coller l'URL de l'image"
+                    />
+
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          try {
+                            await adminEditCategory(cat.id, { image: categoryImageDrafts[cat.id] || cat.image });
+                            alert(`Bannière mise à jour pour ${cat.name}.`);
+                          } catch (err) {
+                            alert("Impossible de mettre à jour cette bannière.");
+                          }
+                        }}
+                        className="bg-[#111111] hover:bg-black text-[#FAF6F0] text-[10px] font-mono uppercase tracking-widest font-bold px-4 py-2.5 rounded-xl cursor-pointer shadow border border-[#D4AF37]/15"
+                      >
+                        Enregistrer
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* Central Media Library and Slides CMS Console */}
             <AdminMediaLibrary />
+
+            {/* JSON Export/Import Backup Card */}
+            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-stone-200/50 shadow-sm space-y-6 text-left border-t-2 border-t-[#D4AF37]">
+              <div className="space-y-1 border-b border-stone-100 pb-4">
+                <h3 className="font-serif text-lg font-bold text-neutral-900">Sauvegarde & Restauration du Catalogue (JSON)</h3>
+                <p className="text-xs text-stone-400 font-light">Exportez toutes vos données locales (produits, catégories, commandes, etc.) dans un fichier de sauvegarde ou importez un fichier de sauvegarde existant.</p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4 items-center justify-between text-xs">
+                <div className="space-y-1">
+                  <p className="font-semibold text-neutral-950">Sauvegarder les données</p>
+                  <p className="text-stone-400 text-[11px]">Téléchargez une copie complète de votre catalogue et de vos ventes au format .json.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleExportJSON}
+                  className="bg-stone-50 hover:bg-stone-100 border border-stone-300 text-stone-700 hover:text-stone-900 text-xs font-mono font-bold py-2.5 px-5 rounded-xl transition cursor-pointer w-full sm:w-auto text-center"
+                >
+                  Exporter en JSON
+                </button>
+              </div>
+
+              <div className="border-t border-stone-100 pt-6 flex flex-col sm:flex-row gap-4 items-center justify-between text-xs">
+                <div className="space-y-1">
+                  <p className="font-semibold text-neutral-950">Restaurer des données</p>
+                  <p className="text-stone-400 text-[11px]">Importez un fichier .json précédemment exporté pour remplacer vos données actuelles.</p>
+                </div>
+                <div className="relative w-full sm:w-auto">
+                  <input
+                    type="file"
+                    accept=".json"
+                    id="import-json-file"
+                    onChange={handleImportJSON}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="import-json-file"
+                    className="bg-[#111111] hover:bg-black text-[#FAF6F0] text-xs font-mono font-bold py-2.5 px-5 rounded-xl cursor-pointer shadow border border-[#D4AF37]/15 inline-block w-full sm:w-auto text-center"
+                  >
+                    Importer un fichier JSON
+                  </label>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
       </main>
 
-      {/* Interactive product image selector overlay modal from media collection */}
-      {productImagePicker && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in text-left">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[85vh] flex flex-col">
-            <div className="flex justify-between items-center border-b border-stone-200 pb-3 shrink-0">
-              <h3 className="font-serif text-sm font-bold text-stone-900">{productImagePicker.title}</h3>
-              <button 
-                type="button" 
-                onClick={() => setProductImagePicker(null)} 
-                className="text-stone-400 hover:text-black p-1 bg-stone-100 hover:bg-stone-200 rounded-full cursor-pointer transition"
-              >
-                ✕
-              </button>
-            </div>
-            
-            <p className="text-xs text-stone-500 shrink-0 font-light font-sans">
-              Sélectionnez ci-dessous l'une des photographies professionnelles de votre Médiathèque Centrale d'Ateliers.
-            </p>
-
-            {/* List with scroll */}
-            <div className="flex-1 overflow-y-auto pr-1">
-              {adminMediaItems.length === 0 ? (
-                <div className="text-center py-12 border border-dashed rounded-2xl bg-stone-50">
-                  <p className="text-xs text-stone-400">Aucun fichier trouvé dans la médiathèque.</p>
-                  <p className="text-[10px] text-stone-400 font-mono mt-1">Téléversez des visuels dans l'onglet "Édition de Site &gt; Médiathèque" d'abord.</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {adminMediaItems.map((item, idx) => (
-                    <button
-                      key={item.id || idx}
-                      type="button"
-                      onClick={() => {
-                        productImagePicker.onSelect(item.url);
-                        setProductImagePicker(null);
-                      }}
-                      className="group border border-stone-200 hover:border-[#8B3A52] rounded-2xl p-2 bg-white flex flex-col gap-2 text-left hover:shadow-md transition cursor-pointer"
-                    >
-                      <div className="aspect-square bg-stone-50 rounded-xl overflow-hidden relative border">
-                        <img src={item.url} alt="" className="w-full h-full object-cover group-hover:scale-105 transition duration-350" />
-                      </div>
-                      <div className="px-1 shrink-0">
-                        <p className="font-serif text-neutral-900 font-bold text-[10px] truncate">{item.name}</p>
-                        <p className="text-[8px] text-stone-400 font-mono truncate mt-0.5">{item.id}</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="flex justify-end pt-3 border-t shrink-0">
-              <button
-                type="button"
-                onClick={() => setProductImagePicker(null)}
-                className="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 font-mono text-xs uppercase rounded-xl cursor-pointer"
-              >
-                Fermer
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 {/* Fenêtre Modale d'accès à la bibliothèque de médias */}
       {productImagePicker && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">

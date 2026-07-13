@@ -32,8 +32,8 @@ export const ContactSection: React.FC = () => {
   };
 
   return (
-    <section className="py-24 bg-white relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="section-spacer bg-white relative">
+      <div className="section-container">
         
         {/* Header */}
         <div className="text-center max-w-xl mx-auto mb-16 space-y-3">
@@ -63,7 +63,7 @@ export const ContactSection: React.FC = () => {
               <div className="space-y-4 pt-2">
                 <div className="flex items-center space-x-4">
                   <span className="p-3 bg-white rounded-2xl text-[#E8A5A5] shadow-sm">
-                    <Phone className="w-5 h-5" />
+                    <Phone className="icon-md" />
                   </span>
                   <div>
                     <h4 className="text-[10px] font-mono uppercase tracking-widest text-gray-400">Téléphone direct</h4>
@@ -73,7 +73,7 @@ export const ContactSection: React.FC = () => {
 
                 <div className="flex items-center space-x-4">
                   <span className="p-3 bg-white rounded-2xl text-[#D4AF37] shadow-sm">
-                    <Mail className="w-5 h-5" />
+                    <Mail className="icon-md" />
                   </span>
                   <div>
                     <h4 className="text-[10px] font-mono uppercase tracking-widest text-gray-400">Courriel électronique</h4>
@@ -83,7 +83,7 @@ export const ContactSection: React.FC = () => {
 
                 <div className="flex items-center space-x-4">
                   <span className="p-3 bg-white rounded-2xl text-[#E8A5A5] shadow-sm">
-                    <MapPin className="w-5 h-5" />
+                    <MapPin className="icon-md" />
                   </span>
                   <div>
                     <h4 className="text-[10px] font-mono uppercase tracking-widest text-gray-400">Showroom Dakar</h4>
@@ -120,7 +120,7 @@ export const ContactSection: React.FC = () => {
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="space-y-1 text-left">
-                    <label className="text-xs font-mono uppercase tracking-widest text-[#2D2D2D] font-semibold">
+                    <label className="form-label">
                       Votre Nom Complet *
                     </label>
                     <input
@@ -130,12 +130,12 @@ export const ContactSection: React.FC = () => {
                       value={formData.name}
                       onChange={e => setFormData({ ...formData, name: e.target.value })}
                       placeholder="Ex: Fatou Diome"
-                      className="w-full px-4 py-4 bg-gray-50 rounded-xl text-base border border-transparent focus:border-[#E8A5A5] focus:bg-white outline-none transition"
+                      className="form-input"
                     />
                   </div>
 
                   <div className="space-y-1 text-left">
-                    <label className="text-xs font-mono uppercase tracking-widest text-[#2D2D2D] font-semibold">
+                    <label className="form-label">
                       Téléphone Portable *
                     </label>
                     <input
@@ -145,14 +145,14 @@ export const ContactSection: React.FC = () => {
                       value={formData.phone}
                       onChange={e => setFormData({ ...formData, phone: e.target.value })}
                       placeholder="Ex: +221 77 123 45 67"
-                      className="w-full px-4 py-4 bg-gray-50 rounded-xl text-base border border-transparent focus:border-[#E8A5A5] focus:bg-white outline-none transition"
+                      className="form-input"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="space-y-1 text-left">
-                    <label className="text-xs font-mono uppercase tracking-widest text-[#2D2D2D] font-semibold">
+                    <label className="form-label">
                       Adresse Courriel
                     </label>
                     <input
@@ -161,12 +161,12 @@ export const ContactSection: React.FC = () => {
                       value={formData.email}
                       onChange={e => setFormData({ ...formData, email: e.target.value })}
                       placeholder="Ex: fatou@gmail.com"
-                      className="w-full px-4 py-4 bg-gray-50 rounded-xl text-base border border-transparent focus:border-[#E8A5A5] focus:bg-white outline-none transition"
+                      className="form-input"
                     />
                   </div>
 
                   <div className="space-y-1 text-left">
-                    <label className="text-xs font-mono uppercase tracking-widest text-[#2D2D2D] font-semibold">
+                    <label className="form-label">
                       Sujet de discussion
                     </label>
                     <input
@@ -175,13 +175,13 @@ export const ContactSection: React.FC = () => {
                       value={formData.subject}
                       onChange={e => setFormData({ ...formData, subject: e.target.value })}
                       placeholder="Ex: Conseils pour baptême"
-                      className="w-full px-4 py-4 bg-gray-50 rounded-xl text-base border border-transparent focus:border-[#E8A5A5] focus:bg-white outline-none transition"
+                      className="form-input"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1 text-left">
-                  <label className="text-xs font-mono uppercase tracking-widest text-[#2D2D2D] font-semibold">
+                  <label className="form-label">
                     Description de votre projet de packaging *
                   </label>
                   <textarea
@@ -191,17 +191,17 @@ export const ContactSection: React.FC = () => {
                     value={formData.message}
                     onChange={e => setFormData({ ...formData, message: e.target.value })}
                     placeholder="Écrivez-nous en décrivant votre événement, le type de cadeaux que vous désirez emballer, la date prévue, etc..."
-                    className="w-full px-4 py-4 bg-gray-50 rounded-xl text-base border border-transparent focus:border-[#E8A5A5] focus:bg-white outline-none transition resize-none"
+                    className="form-textarea"
                   />
                 </div>
 
                 <button
                   id="contact-submit-btn"
                   type="submit"
-                  className="w-full bg-[#2D2D2D] hover:bg-black text-white px-8 py-4 min-h-[48px] rounded-xl text-sm uppercase tracking-widest font-semibold flex items-center justify-center space-x-2.5 transition duration-300 cursor-pointer shadow-lg hover:shadow-black/10 active:scale-98"
+                  className="btn-primary w-full h-12 uppercase tracking-widest text-sm flex items-center justify-center space-x-2.5"
                 >
                   <span>Envoyer ma demande d'échange</span>
-                  <Send className="w-4 h-4" />
+                  <Send className="icon-sm" />
                 </button>
 
               </form>

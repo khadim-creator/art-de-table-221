@@ -1,0 +1,57 @@
+name: 🚀 Build & Deploy — Art de Table → Hostinger
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-deploy:
+    name: Build Vite + Upload FTP
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout du code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 📦 Installer les dépendances
+        run: npm ci
+
+      - name: 🔨 Build de production (Vite)
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: ✅ Vérifier le dossier dist/
+        run: |
+          ls -la dist/
+          du -sh dist/
+
+      - name: 🌐 Déploiement vers Hostinger (FTP)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.HOSTINGER_FTP_HOST }}
+          username: ${{ secrets.HOSTINGER_FTP_USER }}
+          password: ${{ secrets.HOSTINGER_FTP_PASS }}
+          local-dir: dist/
+          server-dir: /public_html/
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/.DS_Store
+      - name: 🎉 Déploiement terminé
+        run: |
+          echo "✅ Art de Table déployé avec succès sur artdetable221.com"
+          echo "🕐 $(date)"

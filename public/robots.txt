@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://artdetable221.com/sitemap.xml
+
+# Bloquer les pages admin et dashboard
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /login

@@ -27,7 +27,7 @@ export const UserDashboardView: React.FC = () => {
 
   if (!currentUser) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center pt-32 text-left px-4">
+      <div className="min-h-screen flex flex-col items-center justify-center pt-6 md:pt-10 text-left px-4">
         <div className="text-center space-y-4 max-w-sm">
           <ShieldAlert className="w-12 h-12 text-[#E8A5A5] mx-auto animate-bounce" />
           <h2 className="font-serif text-xl font-bold text-[#2D2D2D]">Accès réservé aux abonnés</h2>
@@ -37,7 +37,7 @@ export const UserDashboardView: React.FC = () => {
           <button
             id="dashboard-login-btn"
             onClick={() => setView('login')}
-            className="w-full bg-[#E8A5A5] text-white py-3.5 rounded-xl uppercase tracking-widest text-xs font-semibold cursor-pointer"
+            className="btn-primary w-full h-12 uppercase tracking-widest text-xs"
           >
             Se Connecter / S'inscrire
           </button>
@@ -84,8 +84,8 @@ export const UserDashboardView: React.FC = () => {
   };
 
   return (
-    <main className="min-h-screen bg-[#FAF9F9] pt-32 pb-24 text-left">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+    <main className="min-h-screen bg-transparent text-left">
+      <div className="section-container section-spacer space-y-12">
         
         {/* Intro */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-gray-100 pb-8">
@@ -104,7 +104,7 @@ export const UserDashboardView: React.FC = () => {
             <button
               id="dashboard-shop-redirect-btn"
               onClick={() => setView('shop')}
-              className="bg-white border border-gray-200 text-[#4A4A4A] text-xs uppercase tracking-widest font-semibold px-6 py-3 rounded-full hover:bg-gray-50 transition"
+              className="btn-secondary px-6 h-10 text-xs uppercase tracking-widest font-semibold"
             >
               Parcourir la Boutique
             </button>
@@ -112,7 +112,7 @@ export const UserDashboardView: React.FC = () => {
               <button
                 id="dashboard-admin-redirect-btn"
                 onClick={() => setView('admin-dashboard')}
-                className="bg-[#D4AF37] text-white text-xs uppercase tracking-widest font-semibold px-6 py-3 rounded-full hover:bg-[#c39e2c] transition shadow-lg shadow-[#D4AF37]/15"
+                className="btn-primary bg-[#D4AF37] hover:bg-[#c39e2c] border-transparent text-white px-6 h-10 text-xs uppercase tracking-widest font-semibold shadow-lg shadow-[#D4AF37]/15"
               >
                 Accéder au Dashboard Admin
               </button>
@@ -130,7 +130,7 @@ export const UserDashboardView: React.FC = () => {
             <div className="bg-white rounded-3xl p-6 border border-gray-150 shadow-sm space-y-5">
               <div className="flex items-center space-x-4">
                 <span className="p-4 bg-[#FDF2F2] rounded-2xl text-[#E8A5A5]">
-                  <User className="w-6 h-6" />
+                  <User className="icon-md" />
                 </span>
                 <div>
                   <h3 className="font-serif text-base font-bold text-[#2D2D2D]">{currentUser.displayName}</h3>
@@ -140,15 +140,15 @@ export const UserDashboardView: React.FC = () => {
 
               <div className="border-t border-gray-50 pt-4 space-y-3.5 text-xs font-light text-gray-500">
                 <div className="flex items-center space-x-2">
-                  <Mail className="w-4 h-4 text-gray-400" />
+                  <Mail className="icon-sm text-gray-400" />
                   <span>{currentUser.email}</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Phone className="w-4 h-4 text-gray-400" />
+                  <Phone className="icon-sm text-gray-400" />
                   <span>+221 (Dakar Bureau de Cérémonies)</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Calendar className="w-4 h-4 text-gray-400" />
+                  <Calendar className="icon-sm text-gray-400" />
                   <span>Inscrit sur le store national</span>
                 </div>
               </div>
@@ -180,14 +180,14 @@ export const UserDashboardView: React.FC = () => {
             {/* 1. PRODUCT ORDERS BLOCK */}
             <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 sm:p-8 space-y-6">
               <h2 className="font-serif text-lg font-bold text-[#2D2D2D] border-b border-gray-50 pb-4 flex items-center space-x-2">
-                <ClipboardList className="w-5 h-5 text-[#E8A5A5]" />
+                <ClipboardList className="icon-md text-[#E8A5A5]" />
                 <span>Suivi de vos commandes physiques</span>
               </h2>
 
               {orders.length === 0 ? (
                 <div className="py-12 text-center text-gray-400 space-y-2">
                   <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center mx-auto text-gray-450 border">
-                    <Inbox className="w-5 h-5" />
+                    <Inbox className="icon-md" />
                   </div>
                   <p className="text-xs font-light">Aucune commande enregistrée à cette adresse.</p>
                 </div>
@@ -230,7 +230,7 @@ export const UserDashboardView: React.FC = () => {
                         <button
                           id={`order-retry-wa-${ord.id}`}
                           onClick={() => triggerWhatsAppOrder(ord)}
-                          className="bg-gray-55 hover:bg-[#25D366] hover:text-white border border-gray-200 hover:border-[#25D366] text-xs font-semibold px-4.5 py-2 rounded-xl transition flex items-center space-x-1.5 cursor-pointer text-[#4A4A4A]"
+                          className="btn-secondary px-4.5 py-2 text-xs font-semibold hover:bg-[#25D366] hover:text-white hover:border-[#25D366] transition flex items-center space-x-1.5 text-[#4A4A4A]"
                         >
                           <span>Renvoyer requête WhatsApp</span>
                         </button>
@@ -246,14 +246,14 @@ export const UserDashboardView: React.FC = () => {
             {/* 2. CUSTOM DEVIS QUOTE BLOCK */}
             <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 sm:p-8 space-y-6">
               <h2 className="font-serif text-lg font-bold text-[#2D2D2D] border-b border-gray-50 pb-4 flex items-center space-x-2">
-                <TrendingUp className="w-5 h-5 text-[#D4AF37]" />
+                <TrendingUp className="icon-md text-[#D4AF37]" />
                 <span>Mes demandes de Devis en cours</span>
               </h2>
 
               {quotes.length === 0 ? (
                 <div className="py-12 text-center text-gray-400 space-y-2">
                   <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center mx-auto text-gray-450 border">
-                    <Inbox className="w-5 h-5" />
+                    <Inbox className="icon-md" />
                   </div>
                   <p className="text-xs font-light">Vous n'avez pas de demande de devis en cours d'évaluation.</p>
                 </div>
@@ -302,9 +302,9 @@ export const UserDashboardView: React.FC = () => {
                               <button
                                 id={`quote-pay-wa-${q.id}`}
                                 onClick={() => handlePayDevisWhatsApp(q)}
-                                className="bg-[#2D2D2D] hover:bg-black text-white text-[10px] font-bold uppercase tracking-widest px-4 py-2.5 rounded-lg transition-transform hover:scale-102 flex items-center space-x-2 cursor-pointer"
+                                className="btn-primary text-[10px] font-bold uppercase tracking-widest px-4 py-2.5 flex items-center space-x-2"
                               >
-                                <CheckCircle className="w-3.5 h-3.5 text-[#25D366]" />
+                                <CheckCircle className="icon-sm text-[#25D366]" />
                                 <span>Agréer & Commander via WhatsApp</span>
                               </button>
                             </div>

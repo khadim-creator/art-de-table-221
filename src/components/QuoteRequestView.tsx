@@ -70,8 +70,9 @@ export const QuoteRequestView: React.FC = () => {
   };
 
   return (
-    <main className="min-h-screen bg-[#FAF9F9] pt-32 pb-24 text-left">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-transparent text-left">
+      <div className="section-container section-spacer">
+        <div className="max-w-4xl mx-auto">
         
         {/* Title area */}
         <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
@@ -96,18 +97,18 @@ export const QuoteRequestView: React.FC = () => {
               <p className="text-xs text-gray-500 font-light max-w-md leading-relaxed">
                 Votre demande de cotation sur-mesure a bien été enregistrée dans nos registres d'atelier. Un message a également été préparé pour WhatsApp pour une confirmation instantanée.
               </p>
-              <div className="pt-4 flex space-x-4">
+              <div className="pt-4 flex space-x-4 justify-center">
                 <button
                   id="quote-success-dashboard-btn"
                   onClick={() => setView('dashboard')}
-                  className="bg-[#2D2D2D] hover:bg-black text-white text-xs uppercase tracking-widest font-semibold px-6 py-3.5 rounded-xl transition"
+                  className="btn-primary px-6 py-3.5 text-xs uppercase tracking-widest font-semibold"
                 >
                   Suivre dans mon Espace
                 </button>
                 <button
                   id="quote-success-shop-btn"
                   onClick={() => setView('shop')}
-                  className="bg-gray-100 hover:bg-gray-200 text-[#4A4A4A] text-xs uppercase tracking-widest font-semibold px-6 py-3.5 rounded-xl transition"
+                  className="btn-secondary px-6 py-3.5 text-xs uppercase tracking-widest font-semibold"
                 >
                   Poursuivre mes Achats
                 </button>
@@ -118,7 +119,7 @@ export const QuoteRequestView: React.FC = () => {
               
               {!currentUser && (
                 <div className="bg-amber-50 rounded-2xl p-4 border border-amber-100 text-xs text-amber-800 flex items-start space-x-3 text-left">
-                  <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                  <AlertCircle className="icon-md text-amber-600 shrink-0 mt-0.5" />
                   <div className="space-y-1">
                     <p className="font-semibold">Connexion Client Obligatoire</p>
                     <p className="font-light">
@@ -138,7 +139,7 @@ export const QuoteRequestView: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-left">
                 <div className="space-y-1.5">
-                  <label className="text-[9px] font-mono uppercase tracking-widest text-[#2D2D2D] font-bold block">
+                  <label className="form-label">
                     Votre Nom Complet *
                   </label>
                   <input
@@ -149,12 +150,12 @@ export const QuoteRequestView: React.FC = () => {
                     value={formData.name}
                     onChange={e => setFormData({ ...formData, name: e.target.value })}
                     placeholder="Ex: Penda Ndiaye"
-                    className="w-full px-4 py-4 bg-gray-50 rounded-xl text-base border border-transparent focus:border-[#E8A5A5] focus:bg-white outline-none transition disabled:opacity-50 h-[48px]"
+                    className="form-input"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[9px] font-mono uppercase tracking-widest text-[#2D2D2D] font-bold block">
+                  <label className="form-label">
                     Téléphone Portable Sénégalais *
                   </label>
                   <input
@@ -165,14 +166,14 @@ export const QuoteRequestView: React.FC = () => {
                     value={formData.phone}
                     onChange={e => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="Ex: +221 77 123 45 67"
-                    className="w-full px-4 py-4 bg-gray-50 rounded-xl text-base border border-transparent focus:border-[#E8A5A5] focus:bg-white outline-none transition disabled:opacity-50 h-[48px]"
+                    className="form-input"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
                 <div className="space-y-1.5 sm:col-span-1">
-                  <label className="text-[9px] font-mono uppercase tracking-widest text-[#2D2D2D] font-bold block">
+                  <label className="form-label">
                     Catégorie Principale
                   </label>
                   <select
@@ -180,7 +181,7 @@ export const QuoteRequestView: React.FC = () => {
                     disabled={!currentUser}
                     value={formData.category}
                     onChange={e => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-4 py-3.5 bg-gray-50 rounded-xl text-xs sm:text-sm border border-transparent focus:border-[#E8A5A5] focus:bg-white outline-none transition disabled:opacity-50 text-[#4A4A4A] h-[48px]"
+                    className="form-select"
                   >
                     {categories.map((cat) => (
                       <option key={cat.id || cat.slug} value={cat.slug}>
@@ -191,7 +192,7 @@ export const QuoteRequestView: React.FC = () => {
                 </div>
 
                 <div className="space-y-1.5 sm:col-span-1">
-                  <label className="text-[9px] font-mono uppercase tracking-widest text-[#2D2D2D] font-bold block">
+                  <label className="form-label">
                     Quantité cible estimée *
                   </label>
                   <input
@@ -203,12 +204,12 @@ export const QuoteRequestView: React.FC = () => {
                     value={formData.targetQuantity}
                     onChange={e => setFormData({ ...formData, targetQuantity: Number(e.target.value) })}
                     placeholder="Ex: 500"
-                    className="w-full px-4 py-3.5 bg-gray-50 rounded-xl text-xs sm:text-sm border border-transparent focus:border-[#E8A5A5] focus:bg-white outline-none transition disabled:opacity-50 h-[48px] font-mono"
+                    className="form-input font-mono"
                   />
                 </div>
 
                 <div className="space-y-1.5 sm:col-span-1">
-                  <label className="text-[9px] font-mono uppercase tracking-widest text-[#2D2D2D] font-bold block">
+                  <label className="form-label">
                     Url Fichier Logo d'Inspiration
                   </label>
                   <input
@@ -218,13 +219,13 @@ export const QuoteRequestView: React.FC = () => {
                     value={formData.customLogoUrl}
                     onChange={e => setFormData({ ...formData, customLogoUrl: e.target.value })}
                     placeholder="Lien Dropbox, Drive ou Pinterest"
-                    className="w-full px-4 py-3.5 bg-gray-50 rounded-xl text-xs sm:text-sm border border-transparent focus:border-[#E8A5A5] focus:bg-white outline-none transition disabled:opacity-50 h-[48px]"
+                    className="form-input"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5 text-left">
-                <label className="text-[9px] font-mono uppercase tracking-widest text-[#2D2D2D] font-bold block">
+                <label className="form-label">
                   Description détaillée de votre besoin de dorage ou contenant *
                 </label>
                 <textarea
@@ -235,7 +236,7 @@ export const QuoteRequestView: React.FC = () => {
                    value={formData.description}
                    onChange={e => setFormData({ ...formData, description: e.target.value })}
                    placeholder="Expliquez-nous en détail votre projet : type d'ornement (ex: ruban de satin corail avec lettrage blanc poudré), les formats attendus pour chaque boîte, les dates de livraison impératives à Dakar..."
-                   className="w-full px-4 py-4 bg-gray-50 rounded-xl text-base border border-transparent focus:border-[#E8A5A5] focus:bg-white outline-none transition disabled:opacity-50 resize-none font-light leading-relaxed"
+                   className="form-textarea font-light leading-relaxed"
                 />
               </div>
 
@@ -243,13 +244,13 @@ export const QuoteRequestView: React.FC = () => {
                 id="quote-submit-btn"
                 type="submit"
                 disabled={loading || !currentUser}
-                className="w-full bg-[#2D2D2D] hover:bg-black text-white text-xs uppercase tracking-widest font-semibold py-4 rounded-xl flex items-center justify-center space-x-2 transition cursor-pointer shadow-lg hover:shadow-black/10 disabled:opacity-50"
+                className="btn-primary w-full h-12 uppercase tracking-widest text-xs flex items-center justify-center space-x-2"
               >
                 {loading ? (
                   <span>Transmission de votre cahier des charges...</span>
                 ) : (
                   <>
-                    <FileText className="w-4 h-4" />
+                    <FileText className="icon-sm" />
                     <span>Transmettre mon Projet & WhatsApp</span>
                   </>
                 )}
@@ -259,6 +260,7 @@ export const QuoteRequestView: React.FC = () => {
           )}
         </div>
 
+        </div>
       </div>
     </main>
   );

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 520" role="img" aria-label="Sacs & Emballages Boutique">
+  <defs>
+    <linearGradient id="bg-sacs-emballages-boutique" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#F5E6D4" />
+      <stop offset="100%" stop-color="#FBF4EC" />
+    </linearGradient>
+    <radialGradient id="glow-sacs-emballages-boutique" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#E3C3A2" stop-opacity="0.75" />
+      <stop offset="100%" stop-color="#E3C3A2" stop-opacity="0" />
+    </radialGradient>
+    <filter id="soft-sacs-emballages-boutique" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="16" />
+    </filter>
+  </defs>
+
+  <rect width="1600" height="520" fill="url(#bg-sacs-emballages-boutique)" />
+
+  <ellipse cx="800" cy="74" rx="1200" ry="220" fill="#F8EDE0" opacity="0.55" />
+  <path d="M0 262C190 235 350 250 526 270C706 290 883 294 1050 270C1198 250 1362 228 1600 240V520H0V262Z" fill="#FFF7F0" opacity="0.86" />
+  <path d="M0 332C180 310 326 322 490 346C656 371 806 388 952 378C1110 368 1258 336 1420 324C1492 319 1554 319 1600 324V520H0V332Z" fill="#FFF9F4" opacity="0.58" />
+
+  <ellipse cx="320" cy="392" rx="260" ry="120" fill="url(#glow-sacs-emballages-boutique)" filter="url(#soft-sacs-emballages-boutique)" />
+  <ellipse cx="1300" cy="394" rx="260" ry="120" fill="url(#glow-sacs-emballages-boutique)" filter="url(#soft-sacs-emballages-boutique)" />
+
+  <g opacity="0.55">
+    <g transform="translate(116 58)">
+      <rect x="0" y="0" width="28" height="28" rx="5" fill="none" stroke="#AA7C49" stroke-opacity="0.42" stroke-width="2.5" />
+      <rect x="24" y="24" width="28" height="28" rx="5" fill="none" stroke="#D0AE84" stroke-opacity="0.28" stroke-width="2.5" />
+    </g>
+    <g transform="translate(318 112)">
+      <rect x="0" y="0" width="22" height="22" rx="4" fill="none" stroke="#AA7C49" stroke-opacity="0.3" stroke-width="2" />
+      <rect x="18" y="18" width="22" height="22" rx="4" fill="none" stroke="#D0AE84" stroke-opacity="0.24" stroke-width="2" />
+    </g>
+    <g transform="translate(730 24)">
+      <rect x="0" y="0" width="30" height="30" rx="5" fill="none" stroke="#AA7C49" stroke-opacity="0.34" stroke-width="2.5" />
+      <rect x="24" y="24" width="30" height="30" rx="5" fill="none" stroke="#D0AE84" stroke-opacity="0.24" stroke-width="2.5" />
+    </g>
+    <g transform="translate(1310 48)">
+      <rect x="0" y="0" width="28" height="28" rx="5" fill="none" stroke="#AA7C49" stroke-opacity="0.42" stroke-width="2.5" />
+      <rect x="24" y="24" width="28" height="28" rx="5" fill="none" stroke="#D0AE84" stroke-opacity="0.28" stroke-width="2.5" />
+    </g>
+    <g transform="translate(1210 146)">
+      <rect x="0" y="0" width="20" height="20" rx="4" fill="none" stroke="#AA7C49" stroke-opacity="0.28" stroke-width="2" />
+      <rect x="18" y="18" width="20" height="20" rx="4" fill="none" stroke="#D0AE84" stroke-opacity="0.22" stroke-width="2" />
+    </g>
+  </g>
+
+  <g opacity="0.32">
+    <path d="M150 110h120" stroke="#AA7C49" stroke-opacity="0.18" stroke-width="4" stroke-linecap="round" />
+    <path d="M1282 126h126" stroke="#AA7C49" stroke-opacity="0.18" stroke-width="4" stroke-linecap="round" />
+    <path d="M760 54h90" stroke="#D0AE84" stroke-opacity="0.18" stroke-width="4" stroke-linecap="round" />
+  </g>
+
+  <text x="800" y="124" text-anchor="middle" dominant-baseline="middle"
+    fill="#AA7C49" font-family="Georgia, 'Times New Roman', serif" font-size="52" letter-spacing="-0.03em">
+    Sacs & Emballages Boutique
+  </text>
+
+  <rect width="1600" height="520" fill="none" stroke="#AA7C49" stroke-opacity="0.08" stroke-width="2" />
+</svg>

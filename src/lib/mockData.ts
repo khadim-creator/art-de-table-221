@@ -1,10 +1,13 @@
 import { Product, Category, Testimonial, Promotion } from '../types';
-import mariagePrestige from '../assets/images/mariage_prestige_1780566116217.png';
-import bouteillesJus from '../assets/images/bouteilles_jus_1780566133711.png';
-import packCosmetique from '../assets/images/pack_cosmetique_1780566149588.png';
-import objetsPublicitaires from '../assets/images/objets_publicitaires_1780566164378.png';
-import accessoiresPack from '../assets/images/accessoires_pack_1780566177329.png';
 import { productsData } from './productsData';
+import eventBannerImage from '../assets/images/event.webp';
+import { getCategoryBannerSrc } from './categoryBannerImages';
+
+const IMAGE_ACCESSOIRES = getCategoryBannerSrc('sacs-emballages-boutique');
+const IMAGE_BOUTEILLES = getCategoryBannerSrc('bouteilles-personnalisees');
+const IMAGE_COSMETIQUE = getCategoryBannerSrc('parfumerie-cosmetique');
+const IMAGE_COMMERCIAL = getCategoryBannerSrc('solutions-entreprises');
+const IMAGE_EVENT = eventBannerImage;
 
 export const categoriesPreset: Category[] = [
   {
@@ -12,7 +15,7 @@ export const categoriesPreset: Category[] = [
     name: "Sacs & Emballages Boutique",
     slug: "sacs-emballages-boutique",
     description: "Sacs Kraft, sacs papier blanc, sacs papier luxe, sacs boutique, sacs cadeaux, sacs Crystal, pochettes cadeaux, tote bags, sacs personnalisés, sacs événementiels.",
-    image: accessoiresPack,
+    image: IMAGE_ACCESSOIRES,
     subcategories: [
       "Sacs Kraft",
       "Sacs papier blanc",
@@ -31,7 +34,7 @@ export const categoriesPreset: Category[] = [
     name: "Emballages Alimentaires",
     slug: "emballages-alimentaires",
     description: "Barquettes Kraft/plastique/alu, boîtes repas, boîtes lunch, boîtes à emporter, papier kraft/cuisson/sandwich, serviettes, couverts jetables, gants.",
-    image: "https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&q=80&w=600",
+    image: getCategoryBannerSrc('emballages-alimentaires'),
     subcategories: [
       "Barquettes Kraft",
       "Barquettes plastiques",
@@ -58,7 +61,7 @@ export const categoriesPreset: Category[] = [
     name: "Gobelets & Emballages Boissons",
     slug: "gobelets-emballages-boissons",
     description: "Gobelets kraft, gobelets carton toutes tailles (200 ml à 500 ml), couvercles, pailles, bouteilles d'eau/jus personnalisées.",
-    image: "https://images.unsplash.com/photo-1513530534585-c7b1394c6d51?auto=format&fit=crop&q=80&w=600",
+    image: getCategoryBannerSrc('gobelets-emballages-boissons'),
     subcategories: [
       "Gobelets 200 ml",
       "Gobelets 250 ml",
@@ -78,7 +81,7 @@ export const categoriesPreset: Category[] = [
     name: "Bols, Saladiers & Pots",
     slug: "bols-saladiers-pots",
     description: "Bols Kraft, bols à salade, saladiers, pots à soupe, pots à glace, couvercles plats et couvercles dômes.",
-    image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600",
+    image: getCategoryBannerSrc('bols-saladiers-pots'),
     subcategories: [
       "Bols Kraft",
       "Bols à salade",
@@ -95,7 +98,7 @@ export const categoriesPreset: Category[] = [
     name: "Fast-food & Restauration",
     slug: "fast-food-restauration",
     description: "Boîtes à burger, boîtes à sandwich, boîtes à tacos, boîtes à pizza, emballages snack, emballages poulet frit.",
-    image: "https://images.unsplash.com/photo-1561758033-d89a9ad46330?auto=format&fit=crop&q=80&w=600",
+    image: getCategoryBannerSrc('fast-food-restauration'),
     subcategories: [
       "Boîtes à burger",
       "Boîtes à sandwich",
@@ -110,7 +113,7 @@ export const categoriesPreset: Category[] = [
     name: "Pâtisserie & Boulangerie",
     slug: "patisserie-boulangerie",
     description: "Boîtes à gâteaux, boîtes à cupcakes, supports à gâteaux, sachets pâtisserie, emballages pâtisserie, boîtes macarons.",
-    image: "https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&q=80&w=600",
+    image: getCategoryBannerSrc('patisserie-boulangerie'),
     subcategories: [
       "Boîtes à gâteaux",
       "Boîtes à cupcakes",
@@ -125,7 +128,7 @@ export const categoriesPreset: Category[] = [
     name: "Bouteilles Personnalisées",
     slug: "bouteilles-personnalisees",
     description: "Bouteilles d'eau et jus personnalisées pour mariage, baptême, Magal, Gamou, anniversaire, entreprise ou formats sur-mesure.",
-    image: bouteillesJus,
+    image: IMAGE_BOUTEILLES,
     subcategories: [
       "Mariage",
       "Baptême",
@@ -144,7 +147,7 @@ export const categoriesPreset: Category[] = [
     name: "Parfumerie & Cosmétique",
     slug: "parfumerie-cosmetique",
     description: "Flacons 30 ml à 500 ml avec spray/pompe/brume, roll-on, pots de crème/beurre/gommage, boîtes et étiquettes cosmétiques.",
-    image: packCosmetique,
+    image: IMAGE_COSMETIQUE,
     subcategories: [
       "Flacons 30 ml",
       "Flacons 50 ml",
@@ -167,7 +170,7 @@ export const categoriesPreset: Category[] = [
     name: "Étiquettes & Stickers",
     slug: "etiquettes-stickers",
     description: "Étiquettes pour alimentation, boissons, cosmétiques, parfums, stickers personnalisés pro, autocollants et stickers logo.",
-    image: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&q=80&w=600",
+    image: IMAGE_COMMERCIAL,
     subcategories: [
       "Alimentaires",
       "Boissons",
@@ -184,7 +187,7 @@ export const categoriesPreset: Category[] = [
     name: "Événementiel",
     slug: "evenementiel",
     description: "Étiquettes, bouteilles personnalisées et packaging raffiné pour vos mariages, baptêmes, Magal et anniversaires.",
-    image: mariagePrestige,
+    image: IMAGE_EVENT,
     subcategories: [
       "Étiquettes mariage",
       "Bouteilles personnalisées mariage",
@@ -207,7 +210,7 @@ export const categoriesPreset: Category[] = [
     name: "Packaging Cadeaux",
     slug: "packaging-cadeaux",
     description: "Coffrets cadeaux, boîtes cadeaux, rubans satin/gros-grain personnalisés, papier cadeau et pochettes cadeaux.",
-    image: "https://images.unsplash.com/photo-1549467657-39328fac558f?auto=format&fit=crop&q=80&w=600",
+    image: IMAGE_BOUTEILLES,
     subcategories: [
       "Coffrets cadeaux",
       "Boîtes cadeaux",
@@ -221,7 +224,7 @@ export const categoriesPreset: Category[] = [
     name: "Articles Personnalisés",
     slug: "articles-personnalises",
     description: "Mugs d'art, tasses, gourdes, stylos gravés, porte-clés, badges, T-shirts et polos brodés.",
-    image: objetsPublicitaires,
+    image: IMAGE_COMMERCIAL,
     subcategories: [
       "Mugs personnalisés",
       "Tasses personnalisées",
@@ -239,7 +242,7 @@ export const categoriesPreset: Category[] = [
     name: "Solutions d'Impression",
     slug: "solutions-impression",
     description: "Impression offset/numérique : cartes de visite, flyers, affiches, roll-up, facturiers, enveloppes et chemises à rabat.",
-    image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=600",
+    image: getCategoryBannerSrc('solutions-impression'),
     subcategories: [
       "Cartes de visite",
       "Flyers",
@@ -265,7 +268,7 @@ export const categoriesPreset: Category[] = [
     name: "Solutions Entreprises",
     slug: "solutions-entreprises",
     description: "Identité visuelle de marque : emballages sur-mesure, enseignes, roll-up, signalétique d'atelier et goodies d'affaires.",
-    image: objetsPublicitaires,
+    image: IMAGE_COMMERCIAL,
     subcategories: [
       "Emballages personnalisés",
       "Sacs personnalisés",
@@ -286,25 +289,25 @@ export const productsPreset: Product[] = productsData;
 export const testimonialsPreset: Testimonial[] = [
   {
     id: "t1",
-    name: "Mariama Diallo",
-    role: "Mariée Prestige (Dakar)",
-    comment: "Art de Table a transformé mon événement ! Les sacs d'invités marbrés or rose et les boîtes dragées d'or étaient de la pure poésie artisanale pour nos tables d'honneur.",
+    name: "Client 01",
+    role: "Événementiel",
+    comment: "Excellent rendu.",
     rating: 5,
     avatar: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&q=80&w=150"
   },
   {
     id: "t2",
-    name: "Awa Ndiaye",
-    role: "Fondatrice de Kelia Organics",
-    comment: "Nous achetons tout notre packaging professionnel de savonnerie et pots de crème chez Art de Table. Impression relief en dorure parfaite et finition poudrée d'exception.",
+    name: "Client 02",
+    role: "Marque",
+    comment: "Très propre.",
     rating: 5,
     avatar: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&q=80&w=150"
   },
   {
     id: "t3",
-    name: "Cheikh Tidiane Sow",
-    role: "Directeur de Restauration Prestige, Almadies",
-    comment: "Nos boîtes burgers et gobelets kraft personnalisés proviennent d'Art de Table. Le support WhatsApp est exemplaire et la qualité d'impression reflète notre statut.",
+    name: "Client 03",
+    role: "Restauration",
+    comment: "Commande simple.",
     rating: 5,
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150"
   }

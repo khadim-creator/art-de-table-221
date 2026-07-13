@@ -1,85 +1,57 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useMemo, useEffect, useRef, useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { 
-  ShoppingBag, 
-  Search, 
-  SlidersHorizontal, 
+import {
   Info,
-  Layers, 
-  CheckCircle2, 
-  ChevronRight,
   ChevronDown,
-  ArrowRight
+  Home,
+  SlidersHorizontal,
+  X,
 } from 'lucide-react';
 import { ProductCard } from './ProductCard';
+import { productMatchesCategoryToken, resolveCategoryToken } from '../lib/catalogNavigation';
+import { getCategoryBannerSrc } from '../lib/categoryBannerImages';
 
 export const ShopView: React.FC = () => {
   const { 
     products, 
     categories, 
     selectedCategoryId, 
+    searchQuery,
     setSelectedCategory, 
     setSelectedProduct,
-    setView 
+    setView,
   } = useApp();
 
-  // Search & Filters state
-  const [searchQuery, setSearchQuery] = useState('');
-  const [minQtyOnly, setMinQtyOnly] = useState<boolean>(false);
-  const [sortBy, setSortBy] = useState<string>('popular'); // popular, price-asc, price-desc
-  const [visibleCount, setVisibleCount] = useState<number>(16);
+  const [visibleCount, setVisibleCount] = useState<number>(8);
+  const [catBarCollapsed, setCatBarCollapsed] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const INITIAL_LOAD = 16;
-  const LOAD_MORE = 16;
+  const INITIAL_LOAD = 8;
+  const LOAD_MORE = 8;
 
   // Reset visible count when filters change
   useEffect(() => {
     setVisibleCount(INITIAL_LOAD);
-  }, [selectedCategoryId, searchQuery, minQtyOnly, sortBy]);
+  }, [selectedCategoryId]);
+
+  // Expand category bar when category changes
+  useEffect(() => {
+    setCatBarCollapsed(false);
+  }, [selectedCategoryId]);
 
   // Filter and Sort Products logic
   const filteredProducts = useMemo(() => {
-    let list = [...products];
-
-    // Category filter
-    if (selectedCategoryId) {
-      const targetId = selectedCategoryId.toLowerCase().trim().replace(/-/g, '');
-      list = list.filter(p => {
-        if (!p.category) return false;
-        const prodCatId = p.category.toLowerCase().trim().replace(/-/g, '');
-        return prodCatId === targetId;
+    return products
+      .filter((product) => productMatchesCategoryToken(product, selectedCategoryId, categories))
+      .filter((product) => {
+        const q = searchQuery.trim().toLowerCase();
+        if (!q) return true;
+        return [product.name, product.description, product.subcategory, product.category]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(q));
       });
-    }
+  }, [products, categories, selectedCategoryId, searchQuery]);
 
-    // Search filter
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      list = list.filter(p => 
-        p.name.toLowerCase().includes(q) || 
-        p.description.toLowerCase().includes(q) ||
-        (p.subcategory && p.subcategory.toLowerCase().includes(q))
-      );
-    }
-
-    // Min Quantity filter (Low MOQ <= 100)
-    if (minQtyOnly) {
-      list = list.filter(p => p.minQty <= 100);
-    }
-
-    // Sort mapping
-    if (sortBy === 'popular') {
-      list.sort((a, b) => b.rating - a.rating || b.reviewsCount - a.reviewsCount);
-    } else if (sortBy === 'price-asc') {
-      list.sort((a, b) => a.price - b.price);
-    } else if (sortBy === 'price-desc') {
-      list.sort((a, b) => b.price - a.price);
-    }
-
-    return list;
-  }, [products, selectedCategoryId, searchQuery, minQtyOnly, sortBy]);
-
-  // Displayed products - slice based on visible count
   const displayedProducts = useMemo(() => {
     return filteredProducts.slice(0, visibleCount);
   }, [filteredProducts, visibleCount]);
@@ -92,7 +64,7 @@ export const ShopView: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Scroll to selected active category pill on mobile
+  // Scroll active pill into view on mobile
   useEffect(() => {
     if (selectedCategoryId && scrollContainerRef.current) {
       const activeEl = document.getElementById(`pill-${selectedCategoryId}`);
@@ -102,83 +74,166 @@ export const ShopView: React.FC = () => {
     }
   }, [selectedCategoryId]);
 
-  return (
-    <main className="min-h-screen bg-[#FFF8F8] pt-24 md:pt-32 pb-24 font-sans text-stone-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* BOUTIQUE HEADER (Extremely minimal and elegant) */}
-        <div className="text-center space-y-3 mb-8">
-          <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#D78D9B] font-bold block">
-            ART DE TABLE • L'ÉLÉGANCE SUR MESURE
-          </span>
-          <h1 className="text-2xl sm:text-4xl font-serif text-[#1E1E1E] font-medium tracking-tight">
-            Sélectionnez un modèle à personnaliser
-          </h1>
-          <p className="text-xs sm:text-sm text-stone-500 font-light max-w-md mx-auto leading-relaxed">
-            Cliquez directement sur l'emballage de votre choix pour y appliquer votre propre logo, couleurs et texte.
-          </p>
-        </div>
+  // Current selected category label
+  const activeCatLabel = useMemo(() => {
+    if (!selectedCategoryId) return 'Tout le catalogue';
+    const resolvedCategoryId = resolveCategoryToken(selectedCategoryId, categories);
+    const cat = categories.find(c => c.id === resolvedCategoryId) || categories.find(c =>
+      c.id.toLowerCase().replace(/-/g, '') === selectedCategoryId.toLowerCase().replace(/-/g, '')
+    );
+    return cat?.name || selectedCategoryId;
+  }, [selectedCategoryId, categories]);
 
-        {/* CENTERED CATEGORY PILLS BAR */}
-        <div className="mb-10 p-1 bg-[#FAF1F1]/60 rounded-2xl border border-rose-100/30 max-w-3xl mx-auto">
-          <div 
-            ref={scrollContainerRef}
-            className="flex items-center space-x-1 overflow-x-auto scrollbar-none py-1 px-1 justify-start sm:justify-center select-none"
+  const activeCategory = useMemo(() => {
+    if (!selectedCategoryId) return null;
+    return categories.find(c => c.id === resolveCategoryToken(selectedCategoryId, categories))
+      || categories.find(c =>
+        c.id.toLowerCase().replace(/-/g, '') === selectedCategoryId.toLowerCase().replace(/-/g, '')
+      )
+      || null;
+  }, [selectedCategoryId, categories]);
+
+  // Categories with products
+  const catsWithProducts = useMemo(() => {
+    return categories.filter(cat =>
+      products.some(product => productMatchesCategoryToken(product, cat.id, categories))
+    );
+  }, [categories, products]);
+
+  return (
+    <main className="min-h-screen font-sans text-stone-800"
+      style={{
+        background: 'linear-gradient(160deg, #FAF4EF 0%, #FFF9F4 35%, #F5E8DC 65%, #FAF1E7 100%)',
+      }}
+    >
+      <div className={selectedCategoryId ? 'section-container pt-0 pb-12 md:pb-20' : 'section-container pt-2 pb-12 md:pt-3 md:pb-20'}>
+
+        {!selectedCategoryId && (
+          <div className="text-center space-y-2 mb-4 md:mb-5">
+            <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#A67C52]/70 font-bold block">
+              ART DE TABLE • L'ÉLÉGANCE SUR MESURE
+            </span>
+            <h1 className="font-display italic text-[clamp(2.2rem,4.8vw,4.8rem)] leading-[0.9] text-[#1E1E1E] tracking-[-0.04em]">
+              Notre Catalogue
+            </h1>
+            <p className="text-sm sm:text-base text-stone-500 font-light max-w-md mx-auto leading-relaxed">
+              {filteredProducts.length} produit{filteredProducts.length > 1 ? 's' : ''} — Cliquez pour personnaliser avec votre logo et couleurs
+            </p>
+          </div>
+        )}
+
+        {activeCategory && (
+          <div className="-mx-4 mb-5 overflow-hidden rounded-[1.75rem] border border-white/70 bg-white/85 shadow-[0_10px_28px_rgba(166,124,82,0.10)] sm:-mx-6 lg:-mx-8">
+            <div className="relative h-[144px] sm:h-[160px] lg:h-[172px] overflow-hidden bg-[#F4E2D1]">
+              <img
+                src={getCategoryBannerSrc(activeCategory.id)}
+                alt={activeCategory.name}
+                className="h-full w-full object-cover object-center"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* ── BANDEAU CATÉGORIES MOBILE (Pills sticky collapsible) ── */}
+        {/* NOTE: Sur desktop le bandeau est dans la Navbar. Sur mobile il est ici. */}
+        <div className="md:hidden mb-4">
+          {/* Barre avec toggle collapse */}
+          <div
+            className="rounded-2xl overflow-hidden transition-all duration-350"
+            style={{
+              background: catBarCollapsed
+                ? 'transparent'
+                : 'linear-gradient(90deg, #8C6845 0%, #A67C52 100%)',
+              boxShadow: catBarCollapsed ? 'none' : '0 4px 20px rgba(166,124,82,0.25)',
+            }}
           >
+            {/* Toggle header */}
             <button
-              id="pill-all"
-              onClick={() => setSelectedCategory(null)}
-              className={`flex-shrink-0 px-4 py-2 rounded-xl text-xs font-semibold tracking-wide transition duration-300 cursor-pointer ${
-                !selectedCategoryId 
-                  ? 'bg-[#8B3A52] text-white shadow-sm' 
-                  : 'bg-transparent text-stone-600 hover:bg-[#8B3A52]/10 hover:text-[#8B3A52]'
-              }`}
+              onClick={() => setCatBarCollapsed(!catBarCollapsed)}
+              className="w-full flex items-center justify-between px-4 py-3 transition"
+              style={{ color: catBarCollapsed ? '#8C6845' : 'white' }}
             >
-              Tout voir ({products.length})
+              <div className="flex items-center gap-2">
+                <SlidersHorizontal className="w-3.5 h-3.5" />
+                <span className="text-xs font-semibold uppercase tracking-wider">
+                  {catBarCollapsed ? `Catégorie : ${activeCatLabel}` : 'Filtrer par catégorie'}
+                </span>
+              </div>
+              <ChevronDown
+                className={`w-4 h-4 transition-transform duration-300 ${catBarCollapsed ? '' : 'rotate-180'}`}
+              />
             </button>
-            {categories.map((cat) => {
-              const count = products.filter(p => {
-                if (!p.category) return false;
-                return p.category.toLowerCase().trim().replace(/-/g, '') === cat.id.toLowerCase().trim().replace(/-/g, '');
-              }).length;
-              if (count === 0) return null;
-              return (
+
+            {/* Pills container — collapsible */}
+            <div
+              className="overflow-hidden transition-all duration-300 ease-in-out"
+              style={{ maxHeight: catBarCollapsed ? '0px' : '120px', opacity: catBarCollapsed ? 0 : 1 }}
+            >
+              <div
+                ref={scrollContainerRef}
+                className="flex items-center gap-1.5 overflow-x-auto scrollbar-none px-3 pb-3 pt-1"
+              >
+                {/* Tout voir */}
                 <button
-                  key={cat.id}
-                  id={`pill-${cat.id}`}
-                  onClick={() => setSelectedCategory(cat.id)}
-                  className={`flex-shrink-0 px-4 py-2 rounded-xl text-xs font-semibold tracking-wide transition duration-300 cursor-pointer flex items-center space-x-1.5 ${
-                    selectedCategoryId === cat.id 
-                      ? 'bg-[#8B3A52] text-white shadow-sm' 
-                      : 'bg-transparent text-stone-600 hover:bg-[#8B3A52]/10 hover:text-[#8B3A52]'
+                  id="pill-all"
+                  onClick={() => { setSelectedCategory(null); setCatBarCollapsed(true); }}
+                  className={`flex-shrink-0 px-3.5 py-2 rounded-full text-xs font-semibold tracking-wide transition duration-200 ${
+                    !selectedCategoryId
+                      ? 'bg-white text-[#8C6845] shadow-sm'
+                      : 'bg-white/20 text-white hover:bg-white/30'
                   }`}
                 >
-                  <span>{cat.name.split(' &')[0]}</span>
+                  <Home className="w-3 h-3 inline mr-1" />
+                  Tout
                 </button>
-              );
-            })}
+
+                {catsWithProducts.map((cat) => {
+                  const count = products.filter(p => productMatchesCategoryToken(p, cat.id, categories)).length;
+                  return (
+                    <button
+                      key={cat.id}
+                      id={`pill-${cat.id}`}
+                      onClick={() => { setSelectedCategory(cat.id); setCatBarCollapsed(true); }}
+                      className={`flex-shrink-0 px-3.5 py-2 rounded-full text-xs font-semibold tracking-wide transition duration-200 whitespace-nowrap ${
+                        selectedCategoryId === cat.id
+                          ? 'bg-white text-[#8C6845] shadow-sm'
+                          : 'bg-white/20 text-white hover:bg-white/30'
+                      }`}
+                    >
+                      {cat.name.split(' &')[0]}
+                      <span className="ml-1 opacity-70 text-[10px]">({count})</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
+
+          {/* Chip active category + clear — visible quand collapsed et catégorie sélectionnée */}
+          {catBarCollapsed && selectedCategoryId && (
+            <div className="flex items-center gap-2 mt-2 px-1">
+              <div
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold"
+                style={{ background: '#A67C52', color: 'white' }}
+              >
+                <span>{activeCatLabel}</span>
+                <button
+                  onClick={() => { setSelectedCategory(null); }}
+                  className="w-3.5 h-3.5 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/40 transition"
+                >
+                  <X className="w-2.5 h-2.5" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* MINIMAL SEARCH COMPONENT (Centered, thin, luxury styling) */}
-        <div className="max-w-md mx-auto mb-12 relative">
-          <Search className="w-3.5 h-3.5 text-stone-400 absolute left-4 top-1/2 -translate-y-1/2" />
-          <input
-            id="shop-search-input"
-            type="text"
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            placeholder="Rechercher un modèle d'emballage (Ex: sac, kraft, boite...)"
-            className="w-full pl-10 pr-4 bg-white/80 border border-stone-200 focus:border-[#8B3A52] rounded-xl outline-none text-xs h-10 font-light shadow-sm transition-colors text-center"
-          />
-        </div>
+        {/* ── PRODUCTS GRID ── */}
+        <div className="space-y-10">
 
-        {/* FULL WIDTH GORGEOUS PRODUCTS CATALOG GRID */}
-        <div className="space-y-12">
-          
           {filteredProducts.length === 0 ? (
-            <div className="bg-white rounded-3xl border border-stone-100 p-12 text-center space-y-4 max-w-xl mx-auto shadow-sm">
-              <div className="w-12 h-12 bg-[#FAF1F1] rounded-full flex items-center justify-center mx-auto text-[#8B3A52]">
+            <div className="bg-white/80 rounded-3xl border border-stone-100 p-12 text-center space-y-4 max-w-xl mx-auto shadow-sm">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto" style={{ background: '#FBF0E7', color: '#A67C52' }}>
                 <Info className="w-5 h-5" />
               </div>
               <div>
@@ -188,44 +243,47 @@ export const ShopView: React.FC = () => {
                 </p>
               </div>
               <button
-                onClick={() => window.open(`https://wa.me/221773010505?text=Bonjour+Art+de+Table,+je+recherche+un+produit+personnalisé+qui+n'est+pas+dans+votre+catalogue.`)}
-                className="inline-flex bg-[#1E1E1E] hover:bg-[#8B3A52] text-white text-[10px] font-semibold uppercase tracking-widest px-5 py-3 rounded-xl transition duration-300 cursor-pointer shadow-sm"
+                onClick={() => window.open(`https://wa.me/221778715875?text=${encodeURIComponent("Bonjour Art de Table, je recherche un produit personnalisé qui n'est pas dans votre catalogue.")}`, '_blank', 'noopener,noreferrer')}
+                className="inline-flex text-white text-[10px] font-semibold uppercase tracking-widest px-5 py-3 rounded-xl transition duration-300 cursor-pointer shadow-sm hover:opacity-90"
+                style={{ background: 'linear-gradient(90deg, #8C6845, #A67C52)' }}
               >
-                Conception sur-mesure WhatsApp
+                Commander sur-mesure
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-6">
-              {displayedProducts.map((prod, idx) => (
-                <ProductCard
-                  key={prod.id}
-                  product={prod}
-                  onClick={() => handleProductCardClick(prod.id)}
-                  idx={idx}
-                />
-              ))}
-            </div>
-          )}
+            <>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4 xl:gap-5">
+                {displayedProducts.map((prod, idx) => (
+                  <div key={prod.id} className="h-full">
+                    <ProductCard
+                      product={prod}
+                      onClick={() => handleProductCardClick(prod.id)}
+                      idx={idx}
+                    />
+                  </div>
+                ))}
+              </div>
 
-          {/* Infinite scroll "Voir plus" button — fluid, no page reload */}
-          {hasMore && (
-            <div className="flex justify-center pt-6">
-              <button
-                id="shop-load-more-btn"
-                onClick={() => setVisibleCount(prev => prev + LOAD_MORE)}
-                className="inline-flex items-center space-x-2 px-8 py-4 bg-white border-2 border-[#8B3A52]/20 hover:border-[#8B3A52] text-[#8B3A52] hover:bg-[#FAF1F1] rounded-2xl text-xs font-bold uppercase tracking-widest transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md"
-              >
-                <span>Voir plus de produits</span>
-                <ChevronDown className="w-4 h-4" />
-              </button>
-            </div>
+              {/* Load more */}
+              {hasMore && (
+                <div className="flex justify-center pt-4">
+                  <button
+                    id="shop-load-more-btn"
+                    onClick={() => setVisibleCount(prev => prev + LOAD_MORE)}
+                    className="btn-secondary px-8 h-12 text-xs font-bold uppercase tracking-widest shadow-sm hover:shadow-md"
+                  >
+                    <span>Voir plus de produits</span>
+                    <ChevronDown className="icon-sm" />
+                  </button>
+                </div>
+              )}
+              {!hasMore && filteredProducts.length > 0 && (
+                <p className="text-center text-[10px] font-mono text-stone-400 pt-2">
+                  {filteredProducts.length} produits — fin du catalogue
+                </p>
+              )}
+            </>
           )}
-          {!hasMore && filteredProducts.length > 0 && (
-            <p className="text-center text-[10px] font-mono text-stone-400 pt-4">
-              {filteredProducts.length} produits chargés — fin du catalogue
-            </p>
-          )}
-
         </div>
 
       </div>

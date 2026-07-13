@@ -1,70 +1,712 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
-@theme {
+:root {
+  /* ============================================================
+     DESIGN SYSTEM VARIABLES (TOKENS)
+     ============================================================ */
+  
+  /* Couleurs */
+  --color-bg: #FAF4EF;
+  --color-surface: #FFFFFF;
+  --color-text: #2A1B13;
+  --color-text-muted: #80614B;
+  --color-primary: #A67C52;
+  --color-primary-hover: #8C6845;
+  --color-accent: #A67C52;
+  --color-accent-hover: #8C6845;
+  --color-border: rgba(166, 124, 82, 0.18);
+  --color-border-hover: rgba(166, 124, 82, 0.34);
+  
+  /* Status Colors */
+  --color-success: #15803D; /* green-700 */
+  --color-success-bg: #F0FDF4; /* green-50 */
+  --color-error: #B91C1C; /* red-700 */
+  --color-error-bg: #FEF2F2; /* red-50 */
+  --color-warning: #B45309; /* amber-700 */
+  --color-warning-bg: #FFFBEB; /* amber-50 */
+
+  /* Typographie */
   --font-sans: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Playfair Display", Georgia, serif;
+  --font-display: "Cormorant Garamond", "Playfair Display", Georgia, serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* Espacements */
+  --spacing-xs: 0.5rem;    /* 8px */
+  --spacing-sm: 0.75rem;   /* 12px */
+  --spacing-md: 1rem;      /* 16px */
+  --spacing-lg: 1.5rem;    /* 24px */
+  --spacing-xl: 2rem;      /* 32px */
+  --spacing-2xl: 3rem;     /* 48px */
+  --spacing-3xl: 4rem;     /* 64px */
+  --spacing-4xl: 6rem;     /* 96px */
+
+  /* Grid & Layout Spacers */
+  --section-max-width: 80rem;       /* 1280px / max-w-7xl */
+  --section-padding-x: 1rem;        /* px-4 */
+  --section-padding-x-md: 1.5rem;   /* px-6 */
+  --section-padding-x-lg: 2rem;     /* px-8 */
+  --section-padding-y: 3rem;        /* py-12 / Espacements verticaux */
+  --section-padding-y-lg: 5rem;     /* py-20 / Espacements verticaux grands */
+
+  /* Border Radius */
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+  --radius-full: 9999px;
+
+  /* Shadows (Ombres) */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 10px 15px -3px rgba(166, 124, 82, 0.06), 0 4px 6px -2px rgba(166, 124, 82, 0.03);
+  --shadow-xl: 0 20px 25px -5px rgba(166, 124, 82, 0.1), 0 10px 10px -5px rgba(166, 124, 82, 0.04);
+  --shadow-premium: 0 22px 70px rgba(166, 124, 82, 0.14);
+
+  /* Transitions & Animations */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-premium: 400ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
+@theme {
+  /* Tailwind CSS v4 Theme Mapping */
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
+
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-text: var(--color-text);
+  --color-text-muted: var(--color-text-muted);
+  --color-accent: var(--color-accent);
+  --color-accent-hover: var(--color-accent-hover);
+  --color-primary: var(--color-primary);
+  --color-primary-hover: var(--color-primary-hover);
+  --color-border: var(--color-border);
+  --color-border-hover: var(--color-border-hover);
+  
+  --color-success: var(--color-success);
+  --color-success-bg: var(--color-success-bg);
+  --color-error: var(--color-error);
+  --color-error-bg: var(--color-error-bg);
+  --color-warning: var(--color-warning);
+  --color-warning-bg: var(--color-warning-bg);
+
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+  --shadow-premium: var(--shadow-premium);
+
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
+  --radius-3xl: var(--radius-3xl);
+  --radius-full: var(--radius-full);
+}
+
+/* ============================================================
+   FOUNDATION — Base document
+   ============================================================ */
 html, body {
   font-size: 16px;
   -webkit-text-size-adjust: 100%;
-  font-family: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #FFF7F8;
-  color: #2D2D2D;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  background-image:
+    radial-gradient(circle at top left, rgba(166, 124, 82, 0.09) 0%, transparent 28%),
+    radial-gradient(circle at 85% 10%, rgba(27, 17, 21, 0.03) 0%, transparent 22%),
+    linear-gradient(180deg, var(--color-bg) 0%, #FFF9FA 48%, #F6E8E9 100%);
+  background-attachment: scroll;
+  scroll-behavior: smooth;
+  min-height: 100%;
 }
 
-/* 
-  LUXURIOUS PINK BRAND EMBELLISHMENT OVERRIDES
-  Bridges all hardcoded tailwind classes seamlessly so the whole site changes color beautifully
-*/
+#root {
+  min-height: 100vh;
+}
+
+::selection {
+  background: rgba(166, 124, 82, 0.16);
+  color: var(--color-text);
+}
+
+body {
+  letter-spacing: -0.01em;
+  line-height: 1.55;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+section {
+  scroll-margin-top: 96px;
+}
+
+/* ============================================================
+   UNIFIED GRIDS & SPACING — Marges et espacements homogènes
+   ============================================================ */
+.section-container {
+  width: 100%;
+  max-width: var(--section-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--section-padding-x);
+  padding-right: var(--section-padding-x);
+}
+@media (min-width: 640px) {
+  .section-container {
+    padding-left: var(--section-padding-x-md);
+    padding-right: var(--section-padding-x-md);
+  }
+}
+@media (min-width: 1024px) {
+  .section-container {
+    padding-left: var(--section-padding-x-lg);
+    padding-right: var(--section-padding-x-lg);
+  }
+}
+
+.section-spacer {
+  padding-top: var(--section-padding-y);
+  padding-bottom: var(--section-padding-y);
+}
+@media (min-width: 1024px) {
+  .section-spacer {
+    padding-top: var(--section-padding-y-lg);
+    padding-bottom: var(--section-padding-y-lg);
+  }
+}
+
+/* ============================================================
+   SURFACES — Fond et cartes
+   ============================================================ */
+.marble-bg {
+  position: relative;
+  background-color: var(--color-bg);
+  background-image:
+    radial-gradient(ellipse at 20% 30%, rgba(166, 124, 82, 0.05) 0%, transparent 42%),
+    linear-gradient(160deg, var(--color-bg) 0%, #FFF9FA 50%, #F8E7EA 100%);
+}
+
+/* ============================================================
+   BRAND COLOR OVERRIDES — Cohérence rose profond premium
+   ============================================================ */
 .bg-\[\#8B3A52\] {
-  background-color: #E27291 !important; /* Premium Rose Blush */
+  background-color: var(--color-primary) !important;
 }
 .text-\[\#8B3A52\] {
-  color: #C84B6F !important; /* Darker Pink with excellent contrast ratio (>= 4.5:1) */
+  color: var(--color-primary) !important;
 }
 .border-\[\#8B3A52\] {
-  border-color: #E27291 !important;
+  border-color: var(--color-primary) !important;
 }
 .hover\:bg-\[\#8B3A52\]\/10:hover {
-  background-color: rgba(226, 114, 145, 0.1) !important;
+  background-color: rgba(166, 124, 82, 0.10) !important;
 }
 .hover\:text-\[\#8B3A52\]:hover {
-  color: #C84B6F !important;
+  color: var(--color-primary) !important;
 }
 .hover\:border-\[\#8B3A52\]:hover {
-  border-color: #E27291 !important;
+  border-color: var(--color-primary) !important;
 }
 .bg-\[\#FFF5F6\] {
-  background-color: #FFF0F2 !important; /* Soft rose background */
+  background-color: var(--color-bg) !important;
 }
 .bg-\[\#FAF7F5\] {
-  background-color: #FFF6F7 !important; /* Pink offwhite background */
+  background-color: var(--color-bg) !important;
 }
 .border-t-2.border-\[\#D4AF37\]\/25 {
-  border-color: rgba(226, 114, 145, 0.25) !important;
+  border-color: rgba(166, 124, 82, 0.18) !important;
 }
 .text-\[\#E8A5A5\] {
-  color: #E27291 !important;
+  color: var(--color-primary) !important;
 }
 .bg-\[\#E8A5A5\]\/10 {
-  background-color: rgba(226, 114, 145, 0.1) !important;
+  background-color: rgba(166, 124, 82, 0.08) !important;
 }
 .border-\[\#E8A5A5\]\/20 {
-  border-color: rgba(226, 114, 145, 0.2) !important;
+  border-color: rgba(166, 124, 82, 0.2) !important;
 }
 
-/* Enhanced font readability utilities */
+/* ============================================================
+   TYPOGRAPHIE
+   ============================================================ */
 h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.02em;
   font-weight: 600;
-  line-height: 1.25;
+  line-height: 1.16;
+  text-wrap: balance;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  color: var(--color-text);
 }
-p, span, li, button, input, textarea {
-  line-height: 1.6;
+
+.font-serif {
+  text-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+p, span, li, button, input, textarea, select {
+  line-height: 1.55;
   letter-spacing: -0.01em;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background-color var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    opacity var(--transition-fast);
+}
+
+:where(button, a):hover {
+  transform: translateY(-1px);
+}
+
+:where(button, a):active {
+  transform: translateY(0) scale(0.985);
+}
+
+:focus-visible {
+  outline: 2px solid rgba(166, 124, 82, 0.85);
+  outline-offset: 3px;
+}
+
+/* ============================================================
+   UNIFIED COMPONENTS (DESIGN SYSTEM)
+   ============================================================ */
+
+/* 1. BUTTONS (Boutons) */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: 0.625rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #FFFFFF !important;
+  background-color: var(--color-primary);
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-premium);
+  text-transform: none;
+}
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  transform: translateY(-1.5px);
+  box-shadow: var(--shadow-md);
+}
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: 0.625rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-primary) !important;
+  background-color: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: var(--transition-premium);
+}
+.btn-secondary:hover:not(:disabled) {
+  background-color: rgba(166, 124, 82, 0.05);
+  border-color: var(--color-primary);
+  transform: translateY(-1.5px);
+}
+.btn-secondary:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+.btn-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-text {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+.btn-text:hover {
+  color: var(--color-primary);
+  transform: translateY(-0.5px);
+}
+
+/* 2. CARDS (Cartes) */
+.card-premium {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-premium);
+  overflow: hidden;
+}
+.card-premium:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--color-border-hover);
+}
+
+.card-glass {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-premium);
+}
+.card-glass:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-premium);
+}
+
+/* 3. FORMS (Formulaires) */
+.form-input {
+  width: 100%;
+  height: 2.75rem;
+  padding-left: var(--spacing-md);
+  padding-right: var(--spacing-md);
+  font-size: 0.875rem;
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1px solid rgba(166, 124, 82, 0.2);
+  border-radius: var(--radius-xl);
+  transition: var(--transition-normal);
+}
+.form-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(166, 124, 82, 0.1);
+  background-color: var(--color-surface);
+}
+
+.form-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-xs);
+}
+
+.form-textarea {
+  width: 100%;
+  min-height: 6rem;
+  padding: var(--spacing-md);
+  font-size: 0.875rem;
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1px solid rgba(166, 124, 82, 0.2);
+  border-radius: var(--radius-xl);
+  transition: var(--transition-normal);
+  resize: vertical;
+}
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(166, 124, 82, 0.1);
+}
+
+.form-select {
+  width: 100%;
+  height: 2.75rem;
+  padding-left: var(--spacing-md);
+  padding-right: var(--spacing-lg);
+  font-size: 0.875rem;
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1px solid rgba(166, 124, 82, 0.2);
+  border-radius: var(--radius-xl);
+  transition: var(--transition-normal);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23A67C52' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--spacing-md) center;
+  background-size: 1rem;
+}
+.form-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(166, 124, 82, 0.1);
+}
+
+/* 4. SEARCH FIELDS (Champs de recherche) */
+.search-input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+.search-input {
+  width: 100%;
+  height: 2.5rem;
+  padding-left: var(--spacing-lg);
+  padding-right: 3rem;
+  font-size: 0.875rem;
+  background-color: #FAF5F5;
+  border: 1px solid rgba(166, 124, 82, 0.1);
+  border-radius: var(--radius-full);
+  transition: var(--transition-normal);
+}
+.search-input:focus {
+  outline: none;
+  background-color: var(--color-surface);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(166, 124, 82, 0.08);
+}
+.search-button {
+  position: absolute;
+  right: 0.125rem;
+  top: 0.125rem;
+  height: 2.25rem;
+  width: 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-primary);
+  border-radius: var(--radius-full);
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+.search-button:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* 5. BADGES */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+.badge-primary {
+  color: var(--color-primary);
+  background-color: rgba(166, 124, 82, 0.08);
+  border: 1px solid rgba(166, 124, 82, 0.15);
+}
+.badge-secondary {
+  color: var(--color-text-muted);
+  background-color: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* 6. ICONS */
+.icon-sm {
+  width: 1rem !important;
+  height: 1rem !important;
+}
+.icon-md {
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+}
+.icon-lg {
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+}
+
+/* ============================================================
+   REDUCED MOTION SUPPORT
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .hero-slide-enter {
+    animation: none !important;
+  }
+}
+
+/* ============================================================
+   CATEGORY BAR — Bandeau sticky collapsible
+   ============================================================ */
+.category-bar {
+  transition: max-height 0.35s cubic-bezier(0.23,1,0.32,1), 
+              opacity 0.25s ease, 
+              padding 0.25s ease;
+  overflow: hidden;
+}
+
+.category-bar.collapsed {
+  max-height: 0 !important;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* ============================================================
+   SCROLLBAR — Masquer sur les listes horizontales
+   ============================================================ */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* ============================================================
+   PRODUCT GRID — Transitions fluides
+   ============================================================ */
+.product-grid-enter {
+  animation: fadeInUp 0.4s ease both;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* ============================================================
+   NAVBAR CATEGORY BAR — Animation collapse
+   ============================================================ */
+.nav-cat-bar {
+  transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.25s ease;
+  overflow: hidden;
+}
+
+/* ============================================================
+   FOOTER PREMIUM — Fond sombre avec accents rose
+   ============================================================ */
+.footer-premium {
+  background: linear-gradient(160deg, #2A0A12 0%, #4B1022 60%, #1B1115 100%);
+}
+
+/* ============================================================
+   MICRO-ANIMATIONS — Hover et interactions
+   ============================================================ */
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+.btn-shimmer:hover {
+  background-image: linear-gradient(90deg, 
+    transparent 20%, 
+    rgba(255,255,255,0.15) 50%, 
+    transparent 80%
+  );
+  background-size: 200% auto;
+  animation: shimmer 1.2s linear infinite;
+}
+
+/* ============================================================
+   HERO BANNER — Slide horizontal et hover premium
+   ============================================================ */
+.hero-banner-card {
+  transition:
+    transform 280ms cubic-bezier(0.23, 1, 0.32, 1),
+    box-shadow 280ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.hero-banner-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-premium);
+}
+
+.hero-slide-enter {
+  animation: heroSlideInLeftToRight 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.hero-artwork {
+  transition:
+    transform 320ms cubic-bezier(0.23, 1, 0.32, 1),
+    filter 320ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.hero-banner-card:hover .hero-artwork {
+  transform: translateX(10px) scale(1.015);
+}
+
+@keyframes heroSlideInLeftToRight {
+  from {
+    opacity: 0;
+    transform: translateX(-28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ============================================================
+   MARBLE VEINS — Decoration lines
+   ============================================================ */
+.marble-vein {
+  position: relative;
+  overflow: hidden;
+}
+
+.marble-vein::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: 
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600'%3E%3Cpath d='M0 150 Q200 120 400 180 T800 160' stroke='rgba(200,100,140,0.06)' stroke-width='2' fill='none'/%3E%3Cpath d='M0 350 Q300 320 500 380 T800 360' stroke='rgba(180,80,120,0.05)' stroke-width='1.5' fill='none'/%3E%3Cpath d='M100 0 Q150 200 180 400 T220 600' stroke='rgba(220,130,160,0.04)' stroke-width='1' fill='none'/%3E%3Cpath d='M600 0 Q650 150 620 350 T680 600' stroke='rgba(200,100,140,0.05)' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-size: cover;
+  pointer-events: none;
+  z-index: 0;
 }
