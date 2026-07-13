@@ -248,7 +248,7 @@ export const Navbar: React.FC = () => {
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className={`flex items-center justify-between gap-3 md:gap-5 transition-all duration-300 ${isScrolled ? 'h-[6.7rem] md:h-[7.5rem]' : 'h-[7.4rem] md:h-[8.4rem]'}`}>
+          <div className={`flex items-center justify-between gap-3 md:gap-5 transition-all duration-300 ${isScrolled ? 'h-[6.1rem] md:h-[6.9rem]' : 'h-[6.8rem] md:h-[7.6rem]'}`}>
             <button
               aria-label="Ouvrir le menu"
               className="md:hidden shrink-0 w-12 h-12 flex items-center justify-center text-[#6A5830] hover:text-[#8C6845] transition"
@@ -269,8 +269,9 @@ export const Navbar: React.FC = () => {
               <div className="relative shrink-0">
                 <button
                   type="button"
+                  onMouseDown={(e) => e.stopPropagation()}
                   onClick={() => setCategoryMenuOpen((open) => !open)}
-                  className={`inline-flex h-[3.25rem] items-center gap-2 rounded-full border px-5 text-[15px] font-semibold transition ${
+                  className={`relative z-10 inline-flex h-[3.55rem] items-center gap-2 rounded-full border px-6 text-[16px] font-semibold transition ${
                     categoryMenuOpen
                       ? 'border-[#A67C52]/30 bg-[#FFF4EA] text-[#8C6845]'
                       : 'border-[#A67C52]/18 bg-[#FFF9F4] text-[#4B3A22] hover:bg-[#FFF4EA]'
@@ -281,14 +282,15 @@ export const Navbar: React.FC = () => {
                 </button>
 
                 <div
-                  className={`absolute left-0 top-[calc(100%+0.75rem)] z-50 w-[min(72rem,calc(100vw-2rem))] overflow-hidden rounded-[1.5rem] border border-[#A67C52]/15 bg-white shadow-[0_24px_80px_rgba(140,104,69,0.18)] transition-all duration-200 ${
+                  onMouseDown={(e) => e.stopPropagation()}
+                  className={`absolute left-0 top-[calc(100%+0.75rem)] z-[60] w-[min(74rem,calc(100vw-2rem))] overflow-hidden rounded-[1.5rem] border border-[#A67C52]/15 bg-white shadow-[0_24px_80px_rgba(140,104,69,0.18)] transition-all duration-200 ${
                     categoryMenuOpen ? 'pointer-events-auto translate-y-0 opacity-100' : 'pointer-events-none -translate-y-2 opacity-0'
                   }`}
                 >
                   <div className="grid gap-3 border-b border-[#A67C52]/10 bg-[linear-gradient(135deg,#1B1115_0%,#2A1B13_100%)] px-5 py-4 sm:px-6">
                     <div>
                       <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/70">Catalogue complet</p>
-                      <h3 className="mt-1 font-display italic text-[1.5rem] leading-none text-white">
+                      <h3 className="mt-1 font-sans text-[1.8rem] font-black leading-none text-white">
                         Catégories et sous-catégories
                       </h3>
                     </div>
@@ -300,17 +302,18 @@ export const Navbar: React.FC = () => {
                   <div className="max-h-[32rem] overflow-y-auto px-4 py-4 sm:px-5">
                     <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
                       {categories.map((cat) => (
-                        <div key={cat.slug} className="rounded-[1.1rem] border border-white/8 bg-[#1B1115] p-4 shadow-[0_10px_30px_rgba(27,17,21,0.16)]">
+                        <div key={cat.slug} className="rounded-[1.1rem] border border-white/8 bg-[#1B1115] p-5 shadow-[0_10px_30px_rgba(27,17,21,0.16)]">
                           <button
                             type="button"
+                            onMouseDown={(e) => e.stopPropagation()}
                             onClick={() => goToCategory(cat.slug)}
-                            className={`flex w-full items-center justify-between gap-3 rounded-[0.9rem] px-3 py-2 text-left transition ${
+                            className={`relative z-10 flex w-full items-center justify-between gap-3 rounded-[0.9rem] px-4 py-3 text-left transition ${
                               selectedCategoryId === cat.slug
                                 ? 'bg-[#A67C52] text-white'
                                 : 'bg-white/6 text-white hover:bg-white/10'
                             }`}
                           >
-                            <span className="text-[13px] font-semibold uppercase tracking-[0.12em]">{cat.label}</span>
+                            <span className="text-[14px] font-semibold uppercase tracking-[0.16em]">{cat.label}</span>
                             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">Voir</span>
                           </button>
 
@@ -320,8 +323,9 @@ export const Navbar: React.FC = () => {
                                 <button
                                   key={sub.slug}
                                   type="button"
+                                  onMouseDown={(e) => e.stopPropagation()}
                                   onClick={() => goToCategory(sub.slug)}
-                                  className={`rounded-full border px-3 py-1.5 text-[11px] font-medium transition ${
+                                  className={`relative z-10 rounded-full border px-3.5 py-1.5 text-[11px] font-medium transition ${
                                     selectedCategoryId === sub.slug
                                       ? 'border-[#A67C52] bg-[#A67C52] text-white'
                                       : 'border-white/10 bg-white/5 text-white/80 hover:bg-white/10'
@@ -361,7 +365,7 @@ export const Navbar: React.FC = () => {
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => setView('dashboard')}
-                    className="hidden sm:flex items-center gap-1.5 h-[3.25rem] px-5 rounded-full bg-[#FFF9F4] border border-[#A67C52]/18 transition text-[15px] text-[#4B3A22] font-medium hover:bg-[#FFF4EA]"
+                    className="hidden sm:flex items-center gap-1.5 h-[3.1rem] px-5 rounded-full bg-[#FFF9F4] border border-[#A67C52]/18 transition text-[14px] text-[#4B3A22] font-medium hover:bg-[#FFF4EA]"
                   >
                     <User className="w-5 h-5" />
                     <span className="hidden lg:inline">Mon compte</span>
@@ -369,20 +373,20 @@ export const Navbar: React.FC = () => {
                   {(currentUser?.isAdmin || currentUser?.email?.toLowerCase() === 'khadxxm05@gmail.com') && (
                     <button
                       onClick={() => setView('admin-dashboard')}
-                      className="hidden sm:flex h-[3.25rem] w-[3.25rem] items-center justify-center rounded-full border border-[#A67C52]/18 bg-[#FFF9F4] text-[#4B3A22] hover:bg-[#FFF4EA] transition"
+                      className="hidden sm:flex h-[3.1rem] w-[3.1rem] items-center justify-center rounded-full border border-[#A67C52]/18 bg-[#FFF9F4] text-[#4B3A22] hover:bg-[#FFF4EA] transition"
                       aria-label="Administration"
                     >
                       <ShieldCheck className="w-5 h-5" />
                     </button>
                   )}
-                  <button onClick={logout} className="w-[3.25rem] h-[3.25rem] flex items-center justify-center text-[#4B3A22] hover:bg-[#FFF4EA] transition rounded-full">
+                  <button onClick={logout} className="w-[3.1rem] h-[3.1rem] flex items-center justify-center text-[#4B3A22] hover:bg-[#FFF4EA] transition rounded-full">
                     <LogOut className="w-5 h-5" />
                   </button>
                 </div>
               ) : (
                 <button
                   onClick={() => setView('login')}
-                  className="hidden sm:flex h-[3.25rem] w-[3.25rem] items-center justify-center rounded-full bg-[#FFF9F4] border border-[#A67C52]/18 transition text-[#4B3A22] hover:bg-[#FFF4EA]"
+                  className="hidden sm:flex h-[3.1rem] w-[3.1rem] items-center justify-center rounded-full bg-[#FFF9F4] border border-[#A67C52]/18 transition text-[#4B3A22] hover:bg-[#FFF4EA]"
                   aria-label="Administration"
                 >
                   <User className="w-5 h-5" />
@@ -391,7 +395,7 @@ export const Navbar: React.FC = () => {
 
                 <button
                 onClick={() => setView('cart')}
-                  className="relative flex h-[3.25rem] w-[3.25rem] items-center justify-center rounded-full bg-[#FFF9F4] border border-[#A67C52]/18 transition text-[#4B3A22] hover:bg-[#FFF4EA]"
+                  className="relative flex h-[3.1rem] w-[3.1rem] items-center justify-center rounded-full bg-[#FFF9F4] border border-[#A67C52]/18 transition text-[#4B3A22] hover:bg-[#FFF4EA]"
                   aria-label="Panier"
                 >
                   <ShoppingBag className="w-5 h-5" />
@@ -416,6 +420,8 @@ export const Navbar: React.FC = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className={`flex items-center gap-1.5 transition-all duration-300 ${isScrolled ? 'h-10' : 'h-11'}`}>
                 <button
+                  type="button"
+                  onMouseDown={(e) => e.stopPropagation()}
                   onClick={goToHome}
                   className={`flex items-center gap-1.5 ${isScrolled ? 'h-9 px-3.5' : 'h-10 px-4'} text-[12px] font-semibold uppercase tracking-[0.18em] transition-all duration-200 whitespace-nowrap rounded-none border-b-2 ${
                     !selectedCategoryId && currentView === 'shop'
@@ -433,6 +439,8 @@ export const Navbar: React.FC = () => {
                 {QUICK_CATS.map(link => (
                   <button
                     key={link.label}
+                    type="button"
+                    onMouseDown={(e) => e.stopPropagation()}
                     onClick={() => goToCategory(link.slug)}
                     className={`transition-all duration-200 whitespace-nowrap border-b-2 ${isScrolled ? 'h-9 px-3 text-[12px]' : 'h-10 px-3.5 text-[12px]'} font-semibold uppercase tracking-[0.14em] ${
                       selectedCategoryId === link.slug && currentView === 'shop'
@@ -447,6 +455,8 @@ export const Navbar: React.FC = () => {
                 <div className="ml-auto" />
 
                 <button
+                  type="button"
+                  onMouseDown={(e) => e.stopPropagation()}
                   onClick={() => goTo('contact')}
                   className={`border-b-2 border-transparent whitespace-nowrap text-white/80 hover:text-white hover:bg-white/10 text-[12px] font-medium uppercase tracking-[0.14em] transition-all duration-200 ${isScrolled ? 'h-9 px-3.5' : 'h-10 px-4'}`}
                 >
@@ -477,6 +487,8 @@ export const Navbar: React.FC = () => {
             <img src={logoImg} alt="Art de Table" className="w-14 h-14 object-contain rounded-2xl bg-white p-1" />
           </div>
           <button
+            type="button"
+            onMouseDown={(e) => e.stopPropagation()}
             onClick={() => setMobileMenuOpen(false)}
             className="w-9 h-9 flex items-center justify-center text-[#8C6845] hover:text-[#6F5337] transition rounded-full hover:bg-[#FFF4EA]"
           >
@@ -487,6 +499,8 @@ export const Navbar: React.FC = () => {
         <div className="p-4 pb-8">
           {/* Accueil */}
           <button
+            type="button"
+            onMouseDown={(e) => e.stopPropagation()}
             onClick={goToHome}
             className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm text-[#8C6845] font-semibold hover:bg-[#FFF5EC] transition mb-2"
           >
@@ -499,6 +513,8 @@ export const Navbar: React.FC = () => {
             {categories.map(c => (
               <div key={c.slug} className="rounded-xl overflow-hidden">
                 <button
+                  type="button"
+                  onMouseDown={(e) => e.stopPropagation()}
                   onClick={() => goToCategory(c.slug)}
                   className={`w-full text-left px-3 py-2.5 text-sm font-medium transition ${
                     selectedCategoryId === c.slug

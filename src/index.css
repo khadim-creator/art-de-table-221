@@ -28,8 +28,8 @@
 
   /* Typographie */
   --font-sans: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Playfair Display", Georgia, serif;
-  --font-display: "Cormorant Garamond", "Playfair Display", Georgia, serif;
+  --font-serif: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
   /* Espacements */
@@ -656,6 +656,10 @@ textarea {
 /* ============================================================
    HERO BANNER — Slide horizontal et hover premium
    ============================================================ */
+.home-hero {
+  min-height: clamp(390px, calc(100svh - 13rem), 520px);
+}
+
 .hero-banner-card {
   transition:
     transform 280ms cubic-bezier(0.23, 1, 0.32, 1),
@@ -689,6 +693,19 @@ textarea {
   to {
     opacity: 1;
     transform: translateX(0);
+  }
+}
+
+.product-card-title {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+@media (max-width: 420px) {
+  .home-hero {
+    min-height: 340px;
   }
 }
 

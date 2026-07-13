@@ -19,12 +19,22 @@ export const FeaturedProducts: React.FC = () => {
   return (
     <section className="section-spacer">
       <div className="section-container">
-        <div className="mb-1.5 sm:mb-2 flex items-end justify-between gap-4">
+        <div className="mb-6 flex items-end justify-between gap-4 sm:mb-8">
           <div className="space-y-1">
-            <h2 className="font-display italic text-[clamp(2.65rem,5vw,5.2rem)] leading-[0.82] tracking-[-0.065em] text-[#1B1115]">
+            <h2 className="font-display italic text-[clamp(1.9rem,4vw,3.4rem)] leading-[0.95] text-[#1B1115]">
               Découvrez notre sélection
             </h2>
           </div>
+          <button
+            onClick={() => {
+              setView('shop');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="btn-secondary hidden min-h-11 shrink-0 px-5 text-[10px] font-semibold uppercase tracking-[0.16em] sm:inline-flex"
+          >
+            <span>Voir plus de produits</span>
+            <ArrowRight className="icon-sm" />
+          </button>
         </div>
         <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
           {feed.map((prod, idx) => (
@@ -37,6 +47,17 @@ export const FeaturedProducts: React.FC = () => {
             </div>
           ))}
         </div>
+
+        <button
+          onClick={() => {
+            setView('shop');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          className="btn-secondary mt-5 min-h-11 w-full text-[10px] font-semibold uppercase tracking-[0.16em] sm:hidden"
+        >
+          <span>Voir plus de produits</span>
+          <ArrowRight className="icon-sm" />
+        </button>
 
         <section className="mt-8 overflow-hidden rounded-[1.35rem] border border-[#A67C52]/18 bg-white shadow-sm md:mt-10">
           <div className="grid items-stretch md:grid-cols-[0.9fr_1.1fr]">

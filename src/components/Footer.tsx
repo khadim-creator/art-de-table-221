@@ -1,7 +1,7 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
 import { Logo } from './Logo';
-import { ArrowUp, MapPin, Phone, Mail, MessageCircle } from 'lucide-react';
+import { MapPin, Phone, Mail, MessageCircle } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   const { setView } = useApp();
@@ -16,7 +16,7 @@ export const Footer: React.FC = () => {
               href="https://wa.me/221778715875?text=Bonjour%20Art%20de%20Table"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-white/20"
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-white/20"
             >
               <MessageCircle className="icon-sm" />
               WhatsApp
@@ -28,14 +28,17 @@ export const Footer: React.FC = () => {
               Navigation
             </div>
             <div className="space-y-2 text-sm text-white/80">
-              <button onClick={() => setView('shop')} className="block transition hover:text-white">
+          <button onClick={() => setView('shop')} className="block transition hover:text-white">
                 Boutique
               </button>
-              <button onClick={() => setView('devis-request')} className="block transition hover:text-white">
+          <button onClick={() => setView('devis-request')} className="block transition hover:text-white">
                 Devis
               </button>
               <button onClick={() => setView('contact')} className="block transition hover:text-white">
                 Contact
+              </button>
+              <button onClick={() => setView('privacy')} className="block transition hover:text-white">
+                Politique de confidentialité
               </button>
             </div>
           </div>
@@ -68,16 +71,13 @@ export const Footer: React.FC = () => {
           <button onClick={() => setView('contact')} className="underline-offset-4 hover:underline">
             Contact
           </button>
+          <button onClick={() => setView('privacy')} className="underline-offset-4 hover:underline">
+            Politique de confidentialité
+          </button>
           <button onClick={() => window.open('https://wa.me/221778715875', '_blank', 'noopener,noreferrer')} className="underline-offset-4 hover:underline">
             WhatsApp
           </button>
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="ml-auto inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-2 text-white transition hover:bg-white/20"
-          >
-            <ArrowUp className="icon-sm" />
-            Haut
-          </button>
+          <span className="ml-auto text-white/90">Website by Khadxm</span>
         </div>
       </div>
     </footer>

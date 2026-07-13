@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { ShoppingCart, Upload, ArrowLeft, MessageCircle } from 'lucide-react';
+import { ShoppingCart, Upload, ArrowLeft, MessageCircle, Pipette } from 'lucide-react';
 import { ProductCard } from './ProductCard';
 
 const COLOR_SWATCHES = [
@@ -27,6 +27,7 @@ export const ProductDetailView: React.FC = () => {
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [qty, setQty] = useState(product?.minQty || 1);
   const [selectedColor, setSelectedColor] = useState('#FFFFFF');
+  const [colorInput, setColorInput] = useState('#FFFFFF');
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [customText, setCustomText] = useState('');
 
@@ -34,9 +35,14 @@ export const ProductDetailView: React.FC = () => {
     setGalleryIndex(0);
     setQty(product?.minQty || 1);
     setSelectedColor('#FFFFFF');
+    setColorInput('#FFFFFF');
     setLogoFile(null);
     setCustomText('');
   }, [product?.id, product?.minQty]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, [product?.id]);
 
   if (!product) return null;
 
@@ -78,18 +84,18 @@ export const ProductDetailView: React.FC = () => {
         background: 'linear-gradient(160deg, #FDF0F3 0%, #FFF5F7 35%, #FCE8EE 65%, #FFF2F5 100%)',
       }}
     >
-      <div className="section-container section-spacer">
+      <div className="section-container py-5 md:py-8">
 
         {/* Back Button */}
         <button
           onClick={handleBack}
-          className="mb-6 inline-flex items-center gap-2 text-sm text-stone-600 hover:text-[#9B2C4A] transition-colors font-medium group"
+          className="mb-4 inline-flex items-center gap-2 text-sm text-stone-600 hover:text-[#9B2C4A] transition-colors font-medium group"
         >
           <ArrowLeft className="icon-sm group-hover:-translate-x-1 transition-transform" />
           Retour au catalogue
         </button>
 
-        <div className="grid grid-cols-1 md:grid-cols-[1.05fr_0.95fr] gap-8 md:gap-14">
+        <div className="grid grid-cols-1 md:grid-cols-[1.02fr_0.98fr] gap-6 md:gap-10">
 
           {/* GALERIE PHOTOS */}
           <div className="relative">
@@ -97,7 +103,7 @@ export const ProductDetailView: React.FC = () => {
               <img
                 src={product.images?.[galleryIndex] || 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=800'}
                 alt={product.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain p-4"
               />
             </div>
             {product.images && product.images.length > 1 && (
@@ -118,7 +124,7 @@ export const ProductDetailView: React.FC = () => {
           </div>
 
           {/* INFOS + PERSONALISATION */}
-          <div className="flex flex-col md:pl-6">
+          <div className="flex flex-col md:pl-2">
 
             {/* Category breadcrumb */}
             <p className="text-[10px] font-mono uppercase tracking-widest text-[#8C6845]/70 mb-2">
@@ -143,7 +149,7 @@ export const ProductDetailView: React.FC = () => {
 
             {/* Description */}
             {product.description && (
-              <p className="text-sm text-stone-600 mb-6 leading-relaxed border-l-2 border-[#A67C52]/20 pl-3">
+              <p className="text-sm text-stone-600 mb-5 leading-relaxed border-l-2 border-[#A67C52]/20 pl-3">
                 {product.description}
               </p>
             )}
@@ -174,17 +180,63 @@ export const ProductDetailView: React.FC = () => {
             </div>
 
             {/* PERSONNALISATION */}
-            <div className="space-y-5 mb-7">
+            <div className="space-y-4 mb-6">
               
               {/* Couleur */}
               <div>
                 <label className="block text-sm font-semibold mb-2 text-stone-800">Couleur</label>
-                <div className="flex gap-2 flex-wrap">
+                <div className="rounded-2xl border border-[#A67C52]/14 bg-white p-3 shadow-sm">
+                  <div className="flex items-center gap-3">
+                    <label
+                      htmlFor="product-color-picker"
+                      className="flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[#A67C52]/18 shadow-sm"
+                      style={{ backgroundColor: selectedColor }}
+                      aria-label="Choisir une couleur"
+                    >
+                      <Pipette className="h-4 w-4 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.55)]" />
+                    </label>
+                    <input
+                      id="product-color-picker"
+                      type="color"
+                      value={selectedColor}
+                      onChange={(e) => {
+                        const value = e.target.value.toUpperCase();
+                        setSelectedColor(value);
+                        setColorInput(value);
+                      }}
+                      className="sr-only"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <span className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-[#8C6845]">
+                        Toutes les variantes
+                      </span>
+                      <input
+                        type="text"
+                        value={colorInput}
+                        onChange={(e) => {
+                          const value = e.target.value.trim().toUpperCase();
+                          if (!/^#[0-9A-F]{0,6}$/.test(value)) return;
+                          setColorInput(value);
+                          if (/^#[0-9A-F]{6}$/.test(value)) setSelectedColor(value);
+                        }}
+                        onBlur={() => {
+                          if (!/^#[0-9A-F]{6}$/.test(colorInput)) setColorInput(selectedColor);
+                        }}
+                        className="mt-1 h-10 w-full rounded-xl border border-stone-200 bg-[#FFF9F4] px-3 text-sm font-semibold text-[#2A1B13] outline-none transition focus:border-[#A67C52]/50 focus:ring-2 focus:ring-[#A67C52]/10"
+                        aria-label="Code couleur hexadécimal"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mt-3 flex flex-wrap gap-2">
                   {COLOR_SWATCHES.map(color => (
                     <button
                       key={color.hex}
-                      onClick={() => setSelectedColor(color.hex)}
-                      className={`w-9 h-9 rounded-full border-2 transition-all duration-150 hover:scale-110 ${
+                      onClick={() => {
+                        setSelectedColor(color.hex);
+                        setColorInput(color.hex);
+                      }}
+                        className={`h-8 w-8 rounded-full border-2 transition-all duration-150 hover:scale-105 ${
                         selectedColor === color.hex
                           ? 'border-[#9B2C4A] ring-2 ring-[#9B2C4A]/20 scale-110'
                           : 'border-gray-200 hover:border-gray-400'
@@ -193,6 +245,7 @@ export const ProductDetailView: React.FC = () => {
                       title={color.name}
                     />
                   ))}
+                  </div>
                 </div>
               </div>
 

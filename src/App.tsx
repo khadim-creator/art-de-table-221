@@ -2,7 +2,6 @@ import React, { Suspense, lazy } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Navbar } from './components/Navbar';
-import { WhatsAppButton } from './components/WhatsAppButton';
 import { Footer } from './components/Footer';
 import { CartActivityToast } from './components/CartActivityToast';
 
@@ -15,6 +14,7 @@ const UserDashboardView = lazy(() => import('./components/UserDashboardView').th
 const LoginView = lazy(() => import('./components/LoginView').then((m) => ({ default: m.LoginView })));
 const AdminDashboardView = lazy(() => import('./components/AdminDashboardView').then((m) => ({ default: m.AdminDashboardView })));
 const AboutView = lazy(() => import('./components/AboutView').then((m) => ({ default: m.AboutView })));
+const PrivacyPolicyView = lazy(() => import('./components/PrivacyPolicyView').then((m) => ({ default: m.PrivacyPolicyView })));
 
 const NavigationRouterContent: React.FC = () => {
   const { currentView } = useApp();
@@ -39,6 +39,8 @@ const NavigationRouterContent: React.FC = () => {
         return <LoginView />;
       case 'admin-dashboard':
         return <AdminDashboardView />;
+      case 'privacy':
+        return <PrivacyPolicyView />;
       default:
         return (
           <div className="min-h-screen flex items-center justify-center pt-6 md:pt-10">
@@ -70,7 +72,6 @@ const NavigationRouterContent: React.FC = () => {
 
       {/* Persistent floating helper buttons */}
       <CartActivityToast />
-      <WhatsAppButton />
 
       {/* Corporate Dakar footer */}
       <Footer />

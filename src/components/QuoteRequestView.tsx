@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { Send, FileText, CheckCircle2, User, AlertCircle, Sparkles } from 'lucide-react';
 
-export const QuoteRequestView: React.FC = () => {
+type QuoteRequestViewProps = {
+  embedded?: boolean;
+};
+
+export const QuoteRequestView: React.FC<QuoteRequestViewProps> = ({ embedded = false }) => {
   const { submitQuoteRequest, currentUser, setView, categories } = useApp();
 
   const [formData, setFormData] = useState({
@@ -69,8 +73,10 @@ export const QuoteRequestView: React.FC = () => {
     }
   };
 
+  const Wrapper = embedded ? 'div' : 'main';
+
   return (
-    <main className="min-h-screen bg-transparent text-left">
+    <Wrapper className="bg-transparent text-left">
       <div className="section-container section-spacer">
         <div className="max-w-4xl mx-auto">
         
@@ -262,6 +268,6 @@ export const QuoteRequestView: React.FC = () => {
 
         </div>
       </div>
-    </main>
+    </Wrapper>
   );
 };

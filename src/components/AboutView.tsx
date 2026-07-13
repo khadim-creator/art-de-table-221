@@ -1,5 +1,6 @@
 import React from 'react';
-import { Award, Heart, CheckCircle2, Factory, Gem } from 'lucide-react';
+import { Award, Heart, CheckCircle2, Gem } from 'lucide-react';
+import { QuoteRequestView } from './QuoteRequestView';
 
 export const AboutView: React.FC = () => {
   return (
@@ -22,7 +23,7 @@ export const AboutView: React.FC = () => {
         <div className="absolute top-0 right-0 w-1/3 h-full hidden lg:block opacity-10 bg-[radial-gradient(#E8A5A5_1px,transparent_1px)] [background-size:16px_16px]" />
       </section>
 
-      {/* Storytelling & Dakar Teranga Section */}
+      {/* Storytelling & Quote Request Section */}
       <section className="section-spacer bg-white border-y border-gray-100">
         <div className="section-container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -52,19 +53,9 @@ export const AboutView: React.FC = () => {
               </div>
             </div>
 
-            {/* Right Side Craft Banner */}
-            <div className="relative rounded-3xl overflow-hidden aspect-[4/3] sm:aspect-video lg:aspect-auto lg:h-[420px] shadow-lg border border-gray-100">
-              <img 
-                src="https://images.unsplash.com/photo-1512909006721-3d6018887383?auto=format&fit=crop&q=80&w=800" 
-                alt="Atelier d'art de table dorure de boites dragées dakar"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex items-end p-8">
-                <div className="text-white space-y-1">
-                  <p className="text-xs font-mono uppercase tracking-widest text-[#D4AF37] font-bold">L'Atelier d'Artisans</p>
-                  <h3 className="font-serif text-lg font-bold">Nouage manuel de rubans de satin or à Dakar</h3>
-                </div>
-              </div>
+            {/* Embedded Quote Request Form */}
+            <div className="lg:h-full">
+              <QuoteRequestView embedded />
             </div>
 
           </div>
@@ -194,70 +185,6 @@ export const AboutView: React.FC = () => {
                 <p className="text-xs text-gray-400 font-light leading-relaxed">
                   Nous accompagnons aussi bien les micro-marques et fêtes intimes dès 50 pièces que les grosses commandes industrielles.
                 </p>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* Workshop Gallery Section */}
-      <section className="section-spacer bg-gray-50 border-t border-gray-100">
-        <div className="section-container">
-          <div className="text-center max-w-2xl mx-auto space-y-4 mb-16">
-            <span className="text-[10px] font-mono tracking-widest text-[#D4AF37] uppercase font-bold flex items-center justify-center space-x-1">
-              <Factory className="w-4 h-4" />
-              <span>Galerie Ateliers</span>
-            </span>
-            <h2 className="text-3xl font-serif font-bold text-[#2D2D2D]">Immersion au Cœur de l'Excellence</h2>
-            <p className="text-xs text-gray-400 font-light">
-              Découvrez les coulisses de fabrication de vos dômes, écussons, flacons sérum et coffrets d'affaires de luxe.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            
-            <div className="group relative rounded-3xl overflow-hidden aspect-square shadow-sm bg-white">
-              <img 
-                src="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&q=80&w=400" 
-                alt="Dorure à chaud sous presse à dakar"
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                <span className="text-white text-xs font-mono uppercase tracking-wider">Presse de dorure or</span>
-              </div>
-            </div>
-
-            <div className="group relative rounded-3xl overflow-hidden aspect-square shadow-sm bg-white">
-              <img 
-                src="https://images.unsplash.com/photo-1549467657-39328fac558f?auto=format&fit=crop&q=80&w=400" 
-                alt="Découpe laser cartonnages"
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                <span className="text-white text-xs font-mono uppercase tracking-wider">Matrice de Découpe Laser</span>
-              </div>
-            </div>
-
-            <div className="group relative rounded-3xl overflow-hidden aspect-square shadow-sm bg-white">
-              <img 
-                src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&q=80&w=400" 
-                alt="Détails flacon parfum africain"
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                <span className="text-white text-xs font-mono uppercase tracking-wider">Verrerie Fine Parfumée</span>
-              </div>
-            </div>
-
-            <div className="group relative rounded-3xl overflow-hidden aspect-square shadow-sm bg-white">
-              <img 
-                src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&q=80&w=400" 
-                alt="Cosmetiques d'Afrique de l'Ouest"
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                <span className="text-white text-xs font-mono uppercase tracking-wider">Conditionnement de luxe</span>
               </div>
             </div>
 
