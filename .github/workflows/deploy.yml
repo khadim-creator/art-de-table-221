@@ -51,6 +51,6 @@ jobs:
           port: ${{ secrets.HOSTINGER_FTP_PORT }}
           username: ${{ secrets.HOSTINGER_FTP_USER }}
           password: ${{ secrets.HOSTINGER_FTP_PASS }}
-          server-dir: ${{ secrets.HOSTINGER_REMOTE_PATH }}
+          server-dir: ${{ secrets.HOSTINGER_REMOTE_PATH }}/
           local-dir: ./dist/
           dangerous-clean-slate: true
