@@ -9,51 +9,48 @@ on:
 permissions:
   contents: read
 
+env:
+  NODE_VERSION: 24
+  DEPLOY_DIR: dist
+
 jobs:
   build-and-deploy:
-    name: Build Vite + Upload FTP
     runs-on: ubuntu-latest
+    concurrency:
+      group: hostinger-deploy-main
+      cancel-in-progress: true
 
     steps:
-      - name: 📥 Checkout du code
+      - name: 📥 Checkout
         uses: actions/checkout@v4
 
-      - name: 🟢 Setup Node.js 20
+      - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
 
-      - name: 📦 Installer les dépendances
+      - name: 📦 Install dependencies
         run: npm ci
 
-      - name: 🔨 Build de production (Vite)
+      - name: 🔨 Build production app
         run: npm run build
         env:
           NODE_ENV: production
 
-      - name: ✅ Vérifier le dossier dist/
+      - name: ✅ Check dist folder
         run: |
-          ls -la dist/
-          du -sh dist/
+          test -d "${DEPLOY_DIR}"
+          ls -la "${DEPLOY_DIR}/"
+          du -sh "${DEPLOY_DIR}/"
 
-      - name: 🌐 Déploiement vers Hostinger (FTP)
+      - name: 🚀 Deploy to Hostinger
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.HOSTINGER_FTP_HOST }}
+          port: ${{ secrets.HOSTINGER_FTP_PORT }}
           username: ${{ secrets.HOSTINGER_FTP_USER }}
           password: ${{ secrets.HOSTINGER_FTP_PASS }}
-          protocol: ftps
-          port: 21
-          local-dir: dist/
-          server-dir: /public_html/
-          dangerous-clean-slate: false
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            **/.DS_Store
-      - name: 🎉 Déploiement terminé
-        run: |
-          echo "✅ Art de Table déployé avec succès sur artdetable221.com"
-          echo "🕐 $(date)"
+          server-dir: ${{ secrets.HOSTINGER_REMOTE_PATH }}
+          local-dir: ./dist/
+          dangerous-clean-slate: true
