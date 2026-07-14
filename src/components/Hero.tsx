@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Sparkles, Star, ShieldCheck, Truck, MessageCircle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import heroArtwork1 from '../assets/images/slider-01.png';
 import heroArtwork2 from '../assets/images/slider-02.png';
@@ -86,6 +86,47 @@ const normalizeSlide = (slide: any, fallback: HeroSlide, artworkFallback?: strin
   };
 };
 
+const TRUST_BADGES = [
+  { icon: ShieldCheck, label: 'Qualité garantie' },
+  { icon: Truck, label: 'Livraison rapide' },
+  { icon: Sparkles, label: 'Sur mesure' },
+];
+
+const heroAnimationCss = `
+  @keyframes heroRise {
+    0% { opacity: 0; transform: translateY(26px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes heroRiseSlow {
+    0% { opacity: 0; transform: translateY(40px) scale(0.96); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes heroSweep {
+    0% { transform: translateX(-101%); opacity: 1; }
+    55% { opacity: 1; }
+    100% { transform: translateX(101%); opacity: 0; }
+  }
+  .hero-rise {
+    opacity: 0;
+    animation: heroRise 1.9s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+  .hero-rise-slow {
+    opacity: 0;
+    animation: heroRiseSlow 2.6s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+  .hero-overlay-sweep {
+    background: linear-gradient(115deg, rgba(161,32,74,0.0) 0%, rgba(161,32,74,0.9) 42%, rgba(224,164,88,0.9) 58%, rgba(224,164,88,0.0) 100%);
+    animation: heroSweep 1.8s cubic-bezier(0.76, 0, 0.24, 1) both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-rise, .hero-rise-slow, .hero-overlay-sweep {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+`;
+
 export const Hero: React.FC = () => {
   const { siteSettings, setView, setSelectedCategory } = useApp();
   const [current, setCurrent] = useState(0);
@@ -111,6 +152,12 @@ export const Hero: React.FC = () => {
   }, [slides.length]);
 
   const currentSlide = slides[current] || fallbackSlides[0];
+  const heroThemeClass =
+    current === 0
+      ? 'bg-[#F6E7D4]'
+      : current === 1
+        ? 'bg-[#F8DCE3]'
+        : 'bg-[#E7D2A6]';
 
   const goToLink = (link: string) => {
     if (!link) return;
@@ -132,62 +179,118 @@ export const Hero: React.FC = () => {
     window.location.href = link;
   };
 
+  const whatsappLink =
+    'https://wa.me/221778715875?text=Bonjour%20Art%20de%20Table%2C%20je%20souhaite%20passer%20commande.';
+
   return (
     <section className="relative overflow-hidden bg-white">
-      <div className="section-container">
-        <div key={current} className="home-hero hero-slide-enter relative isolate overflow-hidden border-y border-[#E7D9CF] bg-[#FFF8F9]">
-          <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_78%_48%,rgba(166,124,82,0.12),transparent_42%)]" />
+      <style>{heroAnimationCss}</style>
+      <div
+        key={current}
+        className={`home-hero hero-slide-enter relative isolate overflow-hidden border-y border-[#E7D9CF] ${heroThemeClass}`}
+      >
+        {/* slide transition overlay sweep */}
+        <div aria-hidden="true" className="hero-overlay-sweep pointer-events-none absolute inset-0 z-40" />
 
-          <div className="relative z-10 grid min-h-[inherit] grid-cols-[0.95fr_1.05fr] items-start gap-2 px-4 py-8 sm:gap-5 sm:px-7 sm:py-10 lg:grid-cols-[0.88fr_1.12fr] lg:px-10 lg:py-10">
-            <div className="max-w-[35rem] space-y-3 pt-2 sm:space-y-4 lg:pt-4">
-              <div className="space-y-1.5">
-                <h1 className="max-w-[14ch] font-sans text-[clamp(1.45rem,6.5vw,4.5rem)] font-black leading-[0.92] text-[#A1204A]">
-                  {currentSlide.headlineTop}
-                </h1>
-                {currentSlide.headlineAccent ? (
-                  <p className="max-w-[16ch] font-sans text-[clamp(1.05rem,4.7vw,2.9rem)] font-semibold leading-[1] text-[#8C6845]">
-                    {currentSlide.headlineAccent}
-                  </p>
-                ) : null}
-                {currentSlide.headlineBottom ? (
-                  <h2 className="max-w-[17ch] font-sans text-[clamp(1rem,4.2vw,2.6rem)] font-semibold leading-[1.02] text-[#A1204A]">
-                    {currentSlide.headlineBottom}
-                  </h2>
-                ) : null}
-              </div>
+        {/* soft ambient glows */}
+        <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_82%_38%,rgba(166,124,82,0.16),transparent_46%)]" />
+        <div className="absolute -left-24 top-1/2 z-0 h-72 w-72 -translate-y-1/2 rounded-full bg-[#A1204A]/5 blur-3xl" />
 
-              <p className="max-w-[30rem] text-[0.78rem] leading-5 text-[#4C3A42] sm:text-[1rem] sm:leading-7">
-                {currentSlide.body}
-              </p>
-
-              <div className="flex flex-col items-start gap-2 pt-1 sm:flex-row sm:items-center sm:gap-4">
-                <button
-                  onClick={() => goToLink(currentSlide.ctaLink)}
-                  className="btn-primary min-h-10 px-4 text-[0.68rem] font-semibold uppercase tracking-[0.1em] sm:min-h-11 sm:px-6 sm:text-[0.82rem]"
-                >
-                  <span>{currentSlide.ctaText}</span>
-                  <ArrowRight className="icon-sm" />
-                </button>
-                {currentSlide.meta ? (
-                  <div className="hidden max-w-[20rem] text-[9px] font-semibold uppercase tracking-[0.18em] text-[#8C6845] sm:block sm:text-[10px]">
-                    {currentSlide.meta}
-                  </div>
-                ) : null}
-              </div>
+        <div className="section-container relative z-10 mx-auto grid h-full min-h-[300px] w-full max-w-7xl grid-cols-2 items-start gap-4 px-4 pb-6 pt-0 sm:min-h-[380px] sm:gap-6 sm:px-6 sm:pt-0 lg:min-h-[460px] lg:gap-10 lg:px-8 lg:pt-0">
+          {/* ---------- Left: copy ---------- */}
+          <div className="flex h-full w-full flex-col items-start justify-start gap-2.5 text-left sm:gap-3">
+            {/* headline */}
+            <div className="hero-rise w-full max-w-[34rem] space-y-1" style={{ animationDelay: '0.25s' }}>
+              <h1 className="font-sans text-[clamp(1.5rem,4.8vw,3.6rem)] font-black leading-[0.94] text-[#A1204A]">
+                {currentSlide.headlineTop}
+              </h1>
+              {currentSlide.headlineAccent ? (
+                <p className="font-sans text-[clamp(1.05rem,3.4vw,2.2rem)] font-semibold leading-[1.05] text-[#8C6845]">
+                  {currentSlide.headlineAccent}
+                </p>
+              ) : null}
+              {currentSlide.headlineBottom ? (
+                <h2 className="font-sans text-[clamp(0.95rem,3vw,1.85rem)] font-semibold leading-[1.05] text-[#A1204A]">
+                  {currentSlide.headlineBottom}
+                </h2>
+              ) : null}
             </div>
 
-            {currentSlide.artwork ? (
-              <div className="relative z-20 flex min-h-[210px] items-start justify-center pt-0 sm:min-h-[250px] lg:min-h-[390px]">
+            {/* body */}
+            <p className="hero-rise max-w-[30rem] text-pretty text-[0.85rem] leading-6 text-[#4C3A42] sm:text-[1rem] sm:leading-7" style={{ animationDelay: '0.55s' }}>
+              {currentSlide.body}{' '}
+              {currentSlide.body2 ||
+                'Des formats pensés pour vos tables, vos coffrets et vos événements, avec une finition propre et lisible.'}
+            </p>
+
+            {/* CTAs */}
+            <div className="hero-rise flex w-full flex-col items-stretch gap-2.5 pt-1 sm:w-auto sm:flex-row sm:items-start sm:gap-3" style={{ animationDelay: '1.15s' }}>
+              <button
+                onClick={() => goToLink(currentSlide.ctaLink)}
+                className="btn-primary group min-h-11 w-full justify-center px-6 text-[0.75rem] font-semibold uppercase tracking-[0.1em] shadow-[0_14px_34px_rgba(140,104,69,0.2)] sm:w-auto sm:text-[0.84rem]"
+              >
+                <span>{currentSlide.ctaText}</span>
+                <ArrowRight className="icon-sm transition-transform group-hover:translate-x-1" />
+              </button>
+              <button
+                onClick={() => goToLink(whatsappLink)}
+                className="flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-[#A1204A]/25 bg-transparent px-6 text-[0.75rem] font-semibold uppercase tracking-[0.1em] text-[#A1204A] transition-colors hover:bg-[#A1204A]/5 sm:w-auto sm:text-[0.84rem]"
+              >
+                <MessageCircle className="h-4 w-4" />
+                <span>Commander sur WhatsApp</span>
+              </button>
+            </div>
+
+            {/* trust row */}
+            <div className="hero-rise flex flex-wrap items-center justify-start gap-x-4 gap-y-2 pt-1" style={{ animationDelay: '1.45s' }}>
+              <div className="flex items-center gap-1">
+                <div className="flex">
+                  {[0, 1, 2, 3, 4].map((s) => (
+                    <Star key={s} className="h-3.5 w-3.5 fill-[#E0A458] text-[#E0A458]" />
+                  ))}
+                </div>
+                <span className="text-[0.66rem] font-medium text-[#5C4651]">Clients satisfaits</span>
+              </div>
+              {TRUST_BADGES.map(({ icon: Icon, label }) => (
+                <div key={label} className="flex items-center gap-1.5 text-[#5C4651]">
+                  <Icon className="h-3.5 w-3.5 text-[#8C6845]" />
+                  <span className="text-[0.66rem] font-medium">{label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ---------- Right: artwork ---------- */}
+          {currentSlide.artwork ? (
+            <div className="relative z-20 flex h-full w-full items-start justify-center self-stretch">
+              {/* product stage */}
+              <div className="hero-rise-slow flex h-full w-full max-w-[34rem] items-start justify-center" style={{ animationDelay: '0.35s' }}>
                 <img
                   src={currentSlide.artwork}
-                  alt=""
-                  aria-hidden="true"
-                  className="hero-artwork relative z-20 h-full max-h-[245px] w-full object-contain sm:max-h-[310px] lg:max-h-[440px]"
+                  alt={currentSlide.headlineTop}
+                  className="hero-artwork block h-full max-h-full w-full object-contain object-center"
                 />
               </div>
-            ) : null}
-          </div>
+            </div>
+          ) : null}
         </div>
+
+        {/* ---------- Slide indicators ---------- */}
+        {slides.length > 1 ? (
+          <div className="absolute bottom-3 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2">
+            {slides.map((_, index) => (
+              <button
+                key={index}
+                type="button"
+                aria-label={`Aller au slide ${index + 1}`}
+                onClick={() => setCurrent(index)}
+                className={`h-1.5 rounded-full transition-all ${
+                  index === current ? 'w-6 bg-[#A1204A]' : 'w-1.5 bg-[#A1204A]/30 hover:bg-[#A1204A]/50'
+                }`}
+              />
+            ))}
+          </div>
+        ) : null}
       </div>
     </section>
   );

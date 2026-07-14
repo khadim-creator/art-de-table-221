@@ -1,18 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { ShoppingCart, Upload, ArrowLeft, MessageCircle, Pipette } from 'lucide-react';
+import { ShoppingCart, Upload, ArrowLeft, MessageCircle } from 'lucide-react';
 import { ProductCard } from './ProductCard';
-
-const COLOR_SWATCHES = [
-  { name: 'Blanc', hex: '#FFFFFF' },
-  { name: 'Noir', hex: '#1C1C1C' },
-  { name: 'Rose', hex: '#FDF1F1' },
-  { name: 'Or', hex: '#E5C158' },
-  { name: 'Kraft', hex: '#D2B48C' },
-  { name: 'Vert', hex: '#A8B196' },
-  { name: 'Bleu', hex: '#1A2F4C' },
-  { name: 'Bourgogne', hex: '#7A1C2E' },
-];
 
 export const ProductDetailView: React.FC = () => {
   const { selectedProductId, products, addToCart, setSelectedProduct, setView } = useApp();
@@ -26,16 +15,12 @@ export const ProductDetailView: React.FC = () => {
 
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [qty, setQty] = useState(product?.minQty || 1);
-  const [selectedColor, setSelectedColor] = useState('#FFFFFF');
-  const [colorInput, setColorInput] = useState('#FFFFFF');
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [customText, setCustomText] = useState('');
 
   useEffect(() => {
     setGalleryIndex(0);
     setQty(product?.minQty || 1);
-    setSelectedColor('#FFFFFF');
-    setColorInput('#FFFFFF');
     setLogoFile(null);
     setCustomText('');
   }, [product?.id, product?.minQty]);
@@ -49,7 +34,6 @@ export const ProductDetailView: React.FC = () => {
   const handleAddToCart = () => {
     const instructions = [
       customText.trim() ? `Texte: ${customText.trim()}` : '',
-      selectedColor ? `Couleur: ${selectedColor}` : '',
     ].filter(Boolean).join(' | ');
 
     addToCart(product, qty, instructions, logoFile ? URL.createObjectURL(logoFile) : '', undefined);
@@ -61,7 +45,6 @@ export const ProductDetailView: React.FC = () => {
       '',
       `Produit: ${product.name}`,
       `Quantité: ${qty}`,
-      `Couleur: ${selectedColor}`,
       customText.trim() ? `Texte: ${customText.trim()}` : null,
       logoFile ? `Logo: ${logoFile.name}` : null,
       '',
@@ -181,72 +164,13 @@ export const ProductDetailView: React.FC = () => {
 
             {/* PERSONNALISATION */}
             <div className="space-y-4 mb-6">
-              
-              {/* Couleur */}
-              <div>
-                <label className="block text-sm font-semibold mb-2 text-stone-800">Couleur</label>
-                <div className="rounded-2xl border border-[#A67C52]/14 bg-white p-3 shadow-sm">
-                  <div className="flex items-center gap-3">
-                    <label
-                      htmlFor="product-color-picker"
-                      className="flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[#A67C52]/18 shadow-sm"
-                      style={{ backgroundColor: selectedColor }}
-                      aria-label="Choisir une couleur"
-                    >
-                      <Pipette className="h-4 w-4 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.55)]" />
-                    </label>
-                    <input
-                      id="product-color-picker"
-                      type="color"
-                      value={selectedColor}
-                      onChange={(e) => {
-                        const value = e.target.value.toUpperCase();
-                        setSelectedColor(value);
-                        setColorInput(value);
-                      }}
-                      className="sr-only"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <span className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-[#8C6845]">
-                        Toutes les variantes
-                      </span>
-                      <input
-                        type="text"
-                        value={colorInput}
-                        onChange={(e) => {
-                          const value = e.target.value.trim().toUpperCase();
-                          if (!/^#[0-9A-F]{0,6}$/.test(value)) return;
-                          setColorInput(value);
-                          if (/^#[0-9A-F]{6}$/.test(value)) setSelectedColor(value);
-                        }}
-                        onBlur={() => {
-                          if (!/^#[0-9A-F]{6}$/.test(colorInput)) setColorInput(selectedColor);
-                        }}
-                        className="mt-1 h-10 w-full rounded-xl border border-stone-200 bg-[#FFF9F4] px-3 text-sm font-semibold text-[#2A1B13] outline-none transition focus:border-[#A67C52]/50 focus:ring-2 focus:ring-[#A67C52]/10"
-                        aria-label="Code couleur hexadécimal"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="mt-3 flex flex-wrap gap-2">
-                  {COLOR_SWATCHES.map(color => (
-                    <button
-                      key={color.hex}
-                      onClick={() => {
-                        setSelectedColor(color.hex);
-                        setColorInput(color.hex);
-                      }}
-                        className={`h-8 w-8 rounded-full border-2 transition-all duration-150 hover:scale-105 ${
-                        selectedColor === color.hex
-                          ? 'border-[#9B2C4A] ring-2 ring-[#9B2C4A]/20 scale-110'
-                          : 'border-gray-200 hover:border-gray-400'
-                      }`}
-                      style={{ backgroundColor: color.hex }}
-                      title={color.name}
-                    />
-                  ))}
-                  </div>
-                </div>
+              <div className="rounded-2xl border border-[#A67C52]/14 bg-white p-4 shadow-sm">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#8C6845]">
+                  Variantes
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-stone-600">
+                  Variantes disponibles selon le modèle. Les options se précisent avec votre brief ou votre logo.
+                </p>
               </div>
 
               {/* Logo */}

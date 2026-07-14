@@ -3,6 +3,71 @@ import { ShoppingCart } from 'lucide-react';
 import { Product } from '../types';
 import { useApp } from '../context/AppContext';
 
+type VariantTone = {
+  name: string;
+  color: string;
+  label: string;
+};
+
+const DEFAULT_VARIANTS: VariantTone[] = [
+  { name: 'Kraft', color: '#C8A97E', label: 'Kraft' },
+  { name: 'Rose', color: '#E8A8B7', label: 'Rose' },
+  { name: 'Doré', color: '#C9A84C', label: 'Doré' },
+];
+
+const CATEGORY_VARIANTS: Record<string, VariantTone[]> = {
+  'sacs-emballages-boutique': [
+    { name: 'Kraft', color: '#C8A97E', label: 'Kraft' },
+    { name: 'Ivoire', color: '#F1E2D2', label: 'Ivoire' },
+    { name: 'Bordeaux', color: '#8C6845', label: 'Bordeaux' },
+  ],
+  'emballages-alimentaires': [
+    { name: 'Kraft', color: '#C8A97E', label: 'Kraft' },
+    { name: 'Crème', color: '#F2E6D8', label: 'Crème' },
+    { name: 'Chocolat', color: '#5B4638', label: 'Chocolat' },
+  ],
+  'gobelets-boissons': [
+    { name: 'Bleu', color: '#8DBFD3', label: 'Bleu' },
+    { name: 'Rose', color: '#E8A8B7', label: 'Rose' },
+    { name: 'Doré', color: '#D6B35A', label: 'Doré' },
+  ],
+  'fast-food-restauration': [
+    { name: 'Kraft', color: '#C8A97E', label: 'Kraft' },
+    { name: 'Blanc', color: '#F3F1EC', label: 'Blanc' },
+    { name: 'Noir', color: '#3F342E', label: 'Noir' },
+  ],
+  'parfumerie-cosmetique': [
+    { name: 'Poudré', color: '#D8B4C0', label: 'Poudré' },
+    { name: 'Or pâle', color: '#C9A84C', label: 'Or pâle' },
+    { name: 'Ivoire', color: '#F5EADF', label: 'Ivoire' },
+  ],
+  'solutions-impression': [
+    { name: 'Blanc', color: '#FFFFFF', label: 'Blanc' },
+    { name: 'Anthracite', color: '#4A4A4A', label: 'Anthracite' },
+    { name: 'Doré', color: '#D0A84B', label: 'Doré' },
+  ],
+  'articles-personnalises': [
+    { name: 'Rose', color: '#E7A1B4', label: 'Rose' },
+    { name: 'Bordeaux', color: '#8B3A52', label: 'Bordeaux' },
+    { name: 'Doré', color: '#C9A84C', label: 'Doré' },
+  ],
+  'packaging-cadeaux': [
+    { name: 'Rose poudré', color: '#E8B7C5', label: 'Rose poudré' },
+    { name: 'Ivoire', color: '#F2E7DC', label: 'Ivoire' },
+    { name: 'Doré', color: '#C9A84C', label: 'Doré' },
+  ],
+  'evenementiel': [
+    { name: 'Rose', color: '#E8A8B7', label: 'Rose' },
+    { name: 'Doré', color: '#C9A84C', label: 'Doré' },
+    { name: 'Bordeaux', color: '#8B3A52', label: 'Bordeaux' },
+  ],
+  'solutions-entreprises': [
+    { name: 'Bleu nuit', color: '#465A7B', label: 'Bleu nuit' },
+    { name: 'Doré', color: '#C9A84C', label: 'Doré' },
+    { name: 'Blanc', color: '#F4EFE7', label: 'Blanc' },
+  ],
+};
+
 interface ProductCardProps {
   product: Product;
   onClick: () => void;
@@ -18,6 +83,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onClick, idx 
     ? product.images[0]
     : 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=600';
   const isSelected = selectedProductId === product.id;
+  const colorVariants = CATEGORY_VARIANTS[product.category] || DEFAULT_VARIANTS;
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -68,6 +134,23 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onClick, idx 
           >
             {productName}
           </h3>
+
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-[8px] font-semibold uppercase tracking-[0.18em] text-[#8B6C52]">
+              Variantes
+            </span>
+            <div className="flex items-center justify-center gap-1.5">
+              {colorVariants.map((variant) => (
+                <span
+                  key={variant.name}
+                  className="h-3.5 w-3.5 rounded-full border border-white shadow-[0_0_0_1px_rgba(166,124,82,0.18)]"
+                  style={{ backgroundColor: variant.color }}
+                  title={variant.label}
+                  aria-label={variant.label}
+                />
+              ))}
+            </div>
+          </div>
 
           <div className="mt-auto flex w-full items-end justify-center gap-3">
             <div className="min-w-0 text-center">

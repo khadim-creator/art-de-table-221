@@ -657,7 +657,7 @@ textarea {
    HERO BANNER — Slide horizontal et hover premium
    ============================================================ */
 .home-hero {
-  min-height: clamp(390px, calc(100svh - 13rem), 520px);
+  height: clamp(330px, 44svh, 470px);
 }
 
 .hero-banner-card {
@@ -681,6 +681,10 @@ textarea {
     filter 320ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
+.hero-artwork-enter {
+  animation: heroArtworkSlideIn 760ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 .hero-banner-card:hover .hero-artwork {
   transform: translateX(10px) scale(1.015);
 }
@@ -696,6 +700,24 @@ textarea {
   }
 }
 
+@keyframes heroArtworkSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(32px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-slide-enter,
+  .hero-artwork-enter {
+    animation: none;
+  }
+}
+
 .product-card-title {
   display: -webkit-box;
   overflow: hidden;
@@ -705,7 +727,7 @@ textarea {
 
 @media (max-width: 420px) {
   .home-hero {
-    min-height: 340px;
+    height: 300px;
   }
 }
 

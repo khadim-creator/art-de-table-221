@@ -691,7 +691,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Trigger select product
   const setSelectedProduct = (id: string | null) => {
     setSelectedProductId(id);
-    if (id) setView('product-detail');
+    if (id) {
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'auto' });
+      }
+      setView('product-detail');
+    }
   };
 
   const setSelectedCategory = (id: string | null) => {

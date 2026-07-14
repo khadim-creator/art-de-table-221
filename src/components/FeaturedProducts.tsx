@@ -17,11 +17,11 @@ export const FeaturedProducts: React.FC = () => {
     .slice(0, 12);
 
   return (
-    <section className="section-spacer">
+    <section className="pt-8 pb-12 md:pt-12 md:pb-16">
       <div className="section-container">
         <div className="mb-6 flex items-end justify-between gap-4 sm:mb-8">
           <div className="space-y-1">
-            <h2 className="font-display italic text-[clamp(1.9rem,4vw,3.4rem)] leading-[0.95] text-[#1B1115]">
+            <h2 className="font-display italic text-[clamp(1.2rem,5vw,3.4rem)] leading-[0.95] text-[#1B1115] sm:text-[clamp(1.9rem,4vw,3.4rem)]">
               Découvrez notre sélection
             </h2>
           </div>
@@ -59,7 +59,7 @@ export const FeaturedProducts: React.FC = () => {
           <ArrowRight className="icon-sm" />
         </button>
 
-        <section className="mt-8 overflow-hidden rounded-[1.35rem] border border-[#A67C52]/18 bg-white shadow-sm md:mt-10">
+        <section className="mt-6 overflow-hidden border-y border-[#A67C52]/18 bg-white shadow-sm md:mt-8">
           <div className="grid items-stretch md:grid-cols-[0.9fr_1.1fr]">
             <div className="relative min-h-[210px] overflow-hidden bg-[#F7E8DB] md:min-h-[260px]">
               <img

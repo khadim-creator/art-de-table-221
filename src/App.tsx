@@ -65,7 +65,7 @@ const NavigationRouterContent: React.FC = () => {
           </main>
         }
       >
-        <div className="flex-grow">
+        <div className="flex-grow pt-[6.2rem] md:pt-[8.9rem] pb-20 md:pb-0">
           {handleRenderActiveView()}
         </div>
       </Suspense>
