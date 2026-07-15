@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useApp } from '../context/AppContext';
 import { productMatchesCategoryToken } from '../lib/catalogNavigation';
 import { getCategoryBannerSrc } from '../lib/categoryBannerImages';
+import { CategoryBannerImage } from './CategoryBannerImage';
 
 export const CategorySection: React.FC = () => {
   const { categories, products, setSelectedCategory, setView } = useApp();
@@ -35,24 +36,34 @@ export const CategorySection: React.FC = () => {
               className="group relative overflow-hidden rounded-[1.4rem] border border-white/70 bg-white text-left shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_45px_rgba(84,26,42,0.08)]"
             >
               <div className="relative aspect-[4/5] overflow-hidden">
-                <img
+                {/* Sharp image with better clarity */}
+                <CategoryBannerImage
                   src={getCategoryBannerSrc(cat.id)}
                   alt={cat.name}
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
                 />
-                <div className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#9B2C4A] shadow-sm">
-                  {cat.count}
+
+                {/* Image wrapper for hover effect */}
+                <div className="absolute inset-0 group-hover:scale-[1.03] transition-transform duration-500 ease-out" />
+
+                {/* Count badge - enhanced visibility */}
+                <div className="absolute left-3 top-3 rounded-full bg-white shadow-md px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.18em] text-[#9B2C4A] z-10">
+                  {cat.count} {cat.count > 1 ? 'articles' : 'article'}
                 </div>
-                <div className="absolute inset-x-0 bottom-0 p-3">
-                  <div className="rounded-[1rem] bg-black/28 px-3 py-2.5 shadow-sm">
-                    <div className="text-[9px] font-mono uppercase tracking-[0.2em] text-white/85">
+
+                {/* Gradient overlay for better text contrast */}
+                <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/75 via-black/45 to-transparent" />
+
+                {/* Category text with enhanced contrast */}
+                <div className="absolute inset-x-0 bottom-0 p-3 z-20">
+                  <div className="space-y-1">
+                    <div className="text-[8px] font-mono uppercase tracking-[0.25em] text-white/95 font-semibold">
                       Catégorie
                     </div>
-                    <div className="mt-0.5 flex items-end justify-between gap-3">
-                      <div className="min-w-0 text-sm font-sans font-medium leading-tight !text-white">
+                    <div className="flex items-end justify-between gap-2">
+                      <div className="min-w-0 text-sm font-sans font-bold leading-tight text-white drop-shadow-md">
                         {cat.name}
                       </div>
-                      <span className="text-white/90 font-bold text-base leading-none group-hover:translate-x-1 transition-transform inline-block">
+                      <span className="text-white font-bold text-lg leading-none group-hover:translate-x-1 transition-transform inline-block flex-shrink-0">
                         →
                       </span>
                     </div>
