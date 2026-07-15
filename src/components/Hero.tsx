@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, Sparkles, Star, ShieldCheck, Truck, MessageCircle } from 'lucide-react';
+import { ArrowRight, MessageCircle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import heroArtwork1 from '../assets/images/slider-01.png';
 import heroArtwork2 from '../assets/images/slider-02.png';
@@ -72,12 +72,32 @@ const fallbackSlides: HeroSlide[] = [
 const normalizeSlide = (slide: any, fallback: HeroSlide, artworkFallback?: string, index = 0): HeroSlide => {
   const ctaOverride = HERO_CTA_OVERRIDES[index] || HERO_CTA_OVERRIDES[HERO_CTA_OVERRIDES.length - 1];
 
+  let headlineTop = slide?.headlineTop || slide?.title?.split('\n')?.[0] || fallback.headlineTop;
+  let headlineAccent = slide?.headlineAccent || slide?.highlight || fallback.headlineAccent;
+  let headlineBottom = slide?.headlineBottom || fallback.headlineBottom;
+  let body = slide?.body || slide?.subTitle || fallback.body;
+
+  // Intercept and sanitize any occurrence of "emballages premium" or "emballage premium" from database
+  const sanitizeText = (text: string, fallbackText: string) => {
+    if (!text) return text;
+    if (/emballages?\s+premium/i.test(text)) {
+      return fallbackText;
+    }
+    return text;
+  };
+
+  headlineAccent = sanitizeText(headlineAccent, 'contenant & packaging');
+  headlineBottom = sanitizeText(headlineBottom, 'ALIMENTAIRES');
+  if (body) {
+    body = body.replace(/emballages?\s+premium/gi, 'contenant & packaging');
+  }
+
   return {
     artwork: slide?.artwork || artworkFallback || fallback.artwork,
-    headlineTop: slide?.headlineTop || slide?.title?.split('\n')?.[0] || fallback.headlineTop,
-    headlineAccent: slide?.headlineAccent || slide?.highlight || fallback.headlineAccent,
-    headlineBottom: slide?.headlineBottom || fallback.headlineBottom,
-    body: slide?.body || slide?.subTitle || fallback.body,
+    headlineTop,
+    headlineAccent,
+    headlineBottom,
+    body,
     body2: slide?.body2 || fallback.body2,
     meta: slide?.meta || fallback.meta,
     ctaText: ctaOverride.ctaText,
@@ -86,11 +106,6 @@ const normalizeSlide = (slide: any, fallback: HeroSlide, artworkFallback?: strin
   };
 };
 
-const TRUST_BADGES = [
-  { icon: ShieldCheck, label: 'Qualité garantie' },
-  { icon: Truck, label: 'Livraison rapide' },
-  { icon: Sparkles, label: 'Sur mesure' },
-];
 
 const heroAnimationCss = `
   @keyframes heroRise {
@@ -196,98 +211,100 @@ export const Hero: React.FC = () => {
         <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_82%_38%,rgba(166,124,82,0.16),transparent_46%)]" />
         <div className="absolute -left-24 top-1/2 z-0 h-72 w-72 -translate-y-1/2 rounded-full bg-[#A1204A]/5 blur-3xl" />
 
-        <div className="section-container relative z-10 mx-auto grid h-full min-h-[300px] w-full max-w-7xl grid-cols-2 items-start gap-4 px-4 pb-6 pt-0 sm:min-h-[380px] sm:gap-6 sm:px-6 sm:pt-0 lg:min-h-[460px] lg:gap-10 lg:px-8 lg:pt-0">
-          {/* ---------- Left: copy ---------- */}
-          <div className="flex h-full w-full flex-col items-start justify-start gap-2.5 text-left sm:gap-3">
-            {/* headline */}
-            <div className="hero-rise w-full max-w-[34rem] space-y-1" style={{ animationDelay: '0.25s' }}>
-              <h1 className="font-sans text-[clamp(1.5rem,4.8vw,3.6rem)] font-black leading-[0.94] text-[#A1204A]">
-                {currentSlide.headlineTop}
-              </h1>
-              {currentSlide.headlineAccent ? (
-                <p className="font-sans text-[clamp(1.05rem,3.4vw,2.2rem)] font-semibold leading-[1.05] text-[#8C6845]">
-                  {currentSlide.headlineAccent}
-                </p>
-              ) : null}
-              {currentSlide.headlineBottom ? (
-                <h2 className="font-sans text-[clamp(0.95rem,3vw,1.85rem)] font-semibold leading-[1.05] text-[#A1204A]">
-                  {currentSlide.headlineBottom}
-                </h2>
-              ) : null}
-            </div>
+        <div className="section-container relative z-10 mx-auto grid h-full w-full max-w-7xl grid-cols-2 items-center gap-3 px-4 py-2 sm:gap-5 sm:px-6 lg:grid-cols-12 lg:gap-8 lg:px-8">
+          {/* ---------- Column 1: Text & CTAs (Left Side) ---------- */}
+          <div className="flex h-full w-full flex-col justify-center gap-3 text-left lg:col-span-8 lg:grid lg:grid-cols-12 lg:gap-6">
+            
+            {/* Headline and Description */}
+            <div className="flex flex-col justify-center gap-1.5 lg:col-span-7">
+              {/* headline */}
+              <div className="hero-rise w-full space-y-0.5" style={{ animationDelay: '0.2s' }}>
+                <h1 className="font-sans text-[clamp(1.15rem,3.8vw,2.5rem)] font-black leading-[1.05] text-[#A1204A]">
+                  {currentSlide.headlineTop}
+                </h1>
+                {currentSlide.headlineAccent ? (
+                  <p className="font-sans text-[clamp(0.95rem,3vw,2rem)] font-semibold leading-[1.05] text-[#8C6845]">
+                    {currentSlide.headlineAccent}
+                  </p>
+                ) : null}
+                {currentSlide.headlineBottom ? (
+                  <h2 className="font-sans text-[clamp(0.85rem,2.8vw,1.75rem)] font-semibold leading-[1.05] text-[#A1204A]">
+                    {currentSlide.headlineBottom}
+                  </h2>
+                ) : null}
+              </div>
 
-            {/* body */}
-            <p className="hero-rise max-w-[30rem] text-pretty text-[0.85rem] leading-6 text-[#4C3A42] sm:text-[1rem] sm:leading-7" style={{ animationDelay: '0.55s' }}>
-              {currentSlide.body}{' '}
-              {currentSlide.body2 ||
-                'Des formats pensés pour vos tables, vos coffrets et vos événements, avec une finition propre et lisible.'}
-            </p>
+              {/* body */}
+              <p className="hero-rise text-pretty text-[0.76rem] leading-normal text-[#4C3A42] sm:text-[0.88rem] sm:leading-relaxed" style={{ animationDelay: '0.4s' }}>
+                {currentSlide.body}{' '}
+                <span className="hidden xs:inline">
+                  {currentSlide.body2 || 'Des formats pensés pour vos tables, vos coffrets et vos événements.'}
+                </span>
+              </p>
+            </div>
 
             {/* CTAs */}
-            <div className="hero-rise flex w-full flex-col items-stretch gap-2.5 pt-1 sm:w-auto sm:flex-row sm:items-start sm:gap-3" style={{ animationDelay: '1.15s' }}>
-              <button
-                onClick={() => goToLink(currentSlide.ctaLink)}
-                className="btn-primary group min-h-11 w-full justify-center px-6 text-[0.75rem] font-semibold uppercase tracking-[0.1em] shadow-[0_14px_34px_rgba(140,104,69,0.2)] sm:w-auto sm:text-[0.84rem]"
-              >
-                <span>{currentSlide.ctaText}</span>
-                <ArrowRight className="icon-sm transition-transform group-hover:translate-x-1" />
-              </button>
-              <button
-                onClick={() => goToLink(whatsappLink)}
-                className="flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-[#A1204A]/25 bg-transparent px-6 text-[0.75rem] font-semibold uppercase tracking-[0.1em] text-[#A1204A] transition-colors hover:bg-[#A1204A]/5 sm:w-auto sm:text-[0.84rem]"
-              >
-                <MessageCircle className="h-4 w-4" />
-                <span>Commander sur WhatsApp</span>
-              </button>
-            </div>
-
-            {/* trust row */}
-            <div className="hero-rise flex flex-wrap items-center justify-start gap-x-4 gap-y-2 pt-1" style={{ animationDelay: '1.45s' }}>
-              <div className="flex items-center gap-1">
-                <div className="flex">
-                  {[0, 1, 2, 3, 4].map((s) => (
-                    <Star key={s} className="h-3.5 w-3.5 fill-[#E0A458] text-[#E0A458]" />
-                  ))}
-                </div>
-                <span className="text-[0.66rem] font-medium text-[#5C4651]">Clients satisfaits</span>
+            <div className="flex flex-col justify-center lg:col-span-5">
+              <div className="hero-rise flex flex-row flex-wrap items-center gap-2 w-full sm:flex-col sm:items-stretch sm:gap-3" style={{ animationDelay: '0.6s' }}>
+                <button
+                  onClick={() => goToLink(currentSlide.ctaLink)}
+                  className="btn-primary group min-h-[38px] px-3.5 text-[10px] font-semibold uppercase tracking-[0.05em] shadow-[0_10px_24px_rgba(140,104,69,0.15)] sm:min-h-11 sm:px-5 sm:text-[0.78rem] sm:w-full sm:justify-center flex-1 text-center justify-center"
+                >
+                  <span>{currentSlide.ctaText}</span>
+                  <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1 sm:h-4 sm:w-4" />
+                </button>
+                <button
+                  onClick={() => goToLink(whatsappLink)}
+                  className="flex min-h-[38px] items-center justify-center gap-1.5 rounded-full border-2 border-[#A1204A]/60 bg-white/95 px-3.5 text-[10px] font-semibold uppercase tracking-[0.05em] text-[#A1204A] transition-colors hover:bg-[#A1204A]/5 sm:min-h-11 sm:px-5 sm:text-[0.78rem] sm:w-full flex-1 text-center justify-center shadow-sm"
+                >
+                  <MessageCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span>
+                    <span className="inline lg:hidden">WhatsApp</span>
+                    <span className="hidden lg:inline">Commander sur WhatsApp</span>
+                  </span>
+                </button>
               </div>
-              {TRUST_BADGES.map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-1.5 text-[#5C4651]">
-                  <Icon className="h-3.5 w-3.5 text-[#8C6845]" />
-                  <span className="text-[0.66rem] font-medium">{label}</span>
-                </div>
-              ))}
             </div>
           </div>
 
-          {/* ---------- Right: artwork ---------- */}
+          {/* ---------- Column 2: Artwork (Right Side) ---------- */}
           {currentSlide.artwork ? (
-            <div className="relative z-20 flex h-full w-full items-start justify-center self-stretch">
-              {/* product stage */}
-              <div className="hero-rise-slow flex h-full w-full max-w-[34rem] items-start justify-center" style={{ animationDelay: '0.35s' }}>
+            <div className="relative z-20 flex h-full w-full items-center justify-center lg:col-span-4">
+              <div className="hero-rise-slow flex h-full w-full items-center justify-center" style={{ animationDelay: '0.35s' }}>
                 <img
                   src={currentSlide.artwork}
                   alt={currentSlide.headlineTop}
-                  className="hero-artwork block h-full max-h-full w-full object-contain object-center"
+                  className="hero-artwork block h-full max-h-[250px] xs:max-h-[280px] sm:max-h-[300px] lg:max-h-[380px] w-full max-w-full object-contain object-center scale-105 xs:scale-110 sm:scale-100"
                 />
               </div>
             </div>
           ) : null}
         </div>
 
-        {/* ---------- Slide indicators ---------- */}
+        {/* ---------- Slide counter ---------- */}
         {slides.length > 1 ? (
-          <div className="absolute bottom-3 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2">
+          <div className="absolute bottom-3 right-4 z-30 flex items-center gap-1.5 sm:right-6 lg:right-8">
             {slides.map((_, index) => (
-              <button
-                key={index}
-                type="button"
-                aria-label={`Aller au slide ${index + 1}`}
-                onClick={() => setCurrent(index)}
-                className={`h-1.5 rounded-full transition-all ${
-                  index === current ? 'w-6 bg-[#A1204A]' : 'w-1.5 bg-[#A1204A]/30 hover:bg-[#A1204A]/50'
-                }`}
-              />
+              <React.Fragment key={index}>
+                {index > 0 ? (
+                  <span
+                    aria-hidden="true"
+                    className={`h-px w-4 transition-all sm:w-6 ${
+                      index === current || index - 1 === current ? 'bg-[#A1204A]' : 'bg-[#A1204A]/25'
+                    }`}
+                  />
+                ) : null}
+                <button
+                  type="button"
+                  aria-label={`Aller au slide ${index + 1}`}
+                  onClick={() => setCurrent(index)}
+                  className={`font-sans text-[10px] font-bold tabular-nums tracking-[0.1em] transition-all sm:text-[12px] ${
+                    index === current ? 'text-[#A1204A]' : 'text-[#A1204A]/35 hover:text-[#A1204A]/60'
+                  }`}
+                >
+                  {String(index + 1).padStart(2, '0')}
+                </button>
+              </React.Fragment>
             ))}
           </div>
         ) : null}

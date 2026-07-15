@@ -4,20 +4,33 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { CartActivityToast } from './components/CartActivityToast';
+import { HomeUniverseLinks } from './components/HomeUniverseLinks';
 
-const HomeView = lazy(() => import('./components/HomeView').then((m) => ({ default: m.HomeView })));
-const ShopView = lazy(() => import('./components/ShopView').then((m) => ({ default: m.ShopView })));
-const ProductDetailView = lazy(() => import('./components/ProductDetailView').then((m) => ({ default: m.ProductDetailView })));
-const CartView = lazy(() => import('./components/CartView').then((m) => ({ default: m.CartView })));
-const QuoteRequestView = lazy(() => import('./components/QuoteRequestView').then((m) => ({ default: m.QuoteRequestView })));
-const UserDashboardView = lazy(() => import('./components/UserDashboardView').then((m) => ({ default: m.UserDashboardView })));
-const LoginView = lazy(() => import('./components/LoginView').then((m) => ({ default: m.LoginView })));
-const AdminDashboardView = lazy(() => import('./components/AdminDashboardView').then((m) => ({ default: m.AdminDashboardView })));
-const AboutView = lazy(() => import('./components/AboutView').then((m) => ({ default: m.AboutView })));
-const PrivacyPolicyView = lazy(() => import('./components/PrivacyPolicyView').then((m) => ({ default: m.PrivacyPolicyView })));
+import { HomeView } from './components/HomeView';
+
+const safeLazy = (importFn: () => Promise<any>) => {
+  return lazy(() =>
+    importFn().catch((err) => {
+      console.warn("Dynamic import failed, reloading page...", err);
+      window.location.reload();
+      return { default: () => null };
+    })
+  );
+};
+
+const ShopView = safeLazy(() => import('./components/ShopView').then((m) => ({ default: m.ShopView })));
+const ProductDetailView = safeLazy(() => import('./components/ProductDetailView').then((m) => ({ default: m.ProductDetailView })));
+const CartView = safeLazy(() => import('./components/CartView').then((m) => ({ default: m.CartView })));
+const QuoteRequestView = safeLazy(() => import('./components/QuoteRequestView').then((m) => ({ default: m.QuoteRequestView })));
+const UserDashboardView = safeLazy(() => import('./components/UserDashboardView').then((m) => ({ default: m.UserDashboardView })));
+const LoginView = safeLazy(() => import('./components/LoginView').then((m) => ({ default: m.LoginView })));
+const AdminDashboardView = safeLazy(() => import('./components/AdminDashboardView').then((m) => ({ default: m.AdminDashboardView })));
+const AboutView = safeLazy(() => import('./components/AboutView').then((m) => ({ default: m.AboutView })));
+const PrivacyPolicyView = safeLazy(() => import('./components/PrivacyPolicyView').then((m) => ({ default: m.PrivacyPolicyView })));
 
 const NavigationRouterContent: React.FC = () => {
   const { currentView } = useApp();
+  const isPublicView = currentView !== 'admin-dashboard' && currentView !== 'login';
 
   const handleRenderActiveView = () => {
     switch (currentView) {
@@ -65,13 +78,16 @@ const NavigationRouterContent: React.FC = () => {
           </main>
         }
       >
-        <div className="flex-grow pt-[6.2rem] md:pt-[8.9rem] pb-20 md:pb-0">
+        <div key={currentView} className="flex-grow pt-[6.2rem] md:pt-[5.8rem] pb-0 page-fade-in">
           {handleRenderActiveView()}
         </div>
       </Suspense>
 
       {/* Persistent floating helper buttons */}
       <CartActivityToast />
+
+      {/* Pre-footer targeted SEO category links */}
+      {isPublicView && <HomeUniverseLinks />}
 
       {/* Corporate Dakar footer */}
       <Footer />

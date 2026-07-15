@@ -10,6 +10,7 @@ import {
 import { ProductCard } from './ProductCard';
 import { productMatchesCategoryToken, resolveCategoryToken } from '../lib/catalogNavigation';
 import { getCategoryBannerSrc } from '../lib/categoryBannerImages';
+import { EXCLUDED_CATEGORY_IDS } from '../constants/categories';
 
 export const ShopView: React.FC = () => {
   const { 
@@ -42,7 +43,13 @@ export const ShopView: React.FC = () => {
   // Filter and Sort Products logic
   const filteredProducts = useMemo(() => {
     return products
-      .filter((product) => productMatchesCategoryToken(product, selectedCategoryId, categories))
+      .filter((product) => product && typeof product.category === 'string')
+      .filter((product) => {
+        if (!selectedCategoryId) {
+          return !EXCLUDED_CATEGORY_IDS.includes(product.category);
+        }
+        return productMatchesCategoryToken(product, selectedCategoryId, categories);
+      })
       .filter((product) => {
         const q = searchQuery.trim().toLowerCase();
         if (!q) return true;
@@ -92,21 +99,115 @@ export const ShopView: React.FC = () => {
       )
       || null;
   }, [selectedCategoryId, categories]);
-
-  // Categories with products
+  // Categories with products (excluding Gobelets & Boissons)
   const catsWithProducts = useMemo(() => {
-    return categories.filter(cat =>
+    const filtered = categories.filter(cat =>
+      !EXCLUDED_CATEGORY_IDS.includes(cat.id) &&
       products.some(product => productMatchesCategoryToken(product, cat.id, categories))
     );
+    // Sort so that 'evenementiel' is first
+    return [...filtered].sort((a, b) => {
+      if (a.id === 'evenementiel') return -1;
+      if (b.id === 'evenementiel') return 1;
+      return 0;
+    });
   }, [categories, products]);
+  // SEO optimization: Dynamically update document title and meta description based on selected category
+  useEffect(() => {
+    const siteName = "Art de Table";
+    if (activeCategory) {
+      document.title = `${activeCategory.name} - ${siteName} Sénégal`;
+      
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) {
+        let customDesc = `Découvrez notre collection de ${activeCategory.name} chez Art de Table. Packagings et produits personnalisés premium à Dakar.`;
+        if (activeCategory.id === 'evenementiel') {
+          customDesc = `Événementiel Premium : Coffrets de prestige, cadeaux d'invités et accessoires de luxe personnalisés à Dakar pour mariages et réceptions.`;
+        } else if (activeCategory.id === 'solutions-impression') {
+          customDesc = `Solutions d'Impression haut de gamme : Boîtes, étiquettes autocollantes et supports publicitaires imprimés sur-mesure à Dakar.`;
+        } else if (activeCategory.id === 'sacs-emballages-boutique') {
+          customDesc = `Emballages et Sacs Boutique personnalisés en Kraft, luxe et satin. Sublimez vos colis clients avec un packaging haut de gamme.`;
+        }
+        metaDesc.setAttribute('content', customDesc);
+      }
+    } else {
+      document.title = `Boutique & Catalogue Emballages Premium - ${siteName}`;
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) {
+        metaDesc.setAttribute('content', 'Explorez la boutique Art de Table : sacs en papier, emballages alimentaires, bols, pots, boîtes personnalisées et solutions de packaging de luxe.');
+      }
+    }
+  }, [activeCategory]);
+
+  const breadcrumbJsonLd = useMemo(() => {
+    const items = [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Accueil",
+        "item": "https://artdetable.sn/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Boutique",
+        "item": "https://artdetable.sn/#shop"
+      }
+    ];
+
+    if (activeCategory) {
+      items.push({
+        "@type": "ListItem",
+        "position": 3,
+        "name": activeCategory.name,
+        "item": `https://artdetable.sn/#shop?category=${activeCategory.slug}`
+      });
+    }
+
+    return JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": items
+    });
+  }, [activeCategory]);
 
   return (
-    <main className="min-h-screen font-sans text-stone-800"
-      style={{
-        background: 'linear-gradient(160deg, #FAF4EF 0%, #FFF9F4 35%, #F5E8DC 65%, #FAF1E7 100%)',
-      }}
-    >
+    <main className="min-h-screen font-sans text-stone-800 bg-white">
       <div className={selectedCategoryId ? 'section-container pt-0 pb-12 md:pb-20' : 'section-container pt-2 pb-12 md:pt-3 md:pb-20'}>
+        <script type="application/ld+json">
+          {breadcrumbJsonLd}
+        </script>
+
+        {activeCategory && (
+          <div className="-mx-4 mb-5 overflow-hidden rounded-b-[1.75rem] rounded-t-none border-x-0 border-t-0 border-b border-white/70 bg-white/85 shadow-[0_10px_28px_rgba(166,124,82,0.10)] sm:-mx-6 lg:-mx-8">
+            <div className="relative h-[144px] sm:h-[160px] lg:h-[172px] overflow-hidden bg-[#F4E2D1]">
+              <img
+                src={getCategoryBannerSrc(activeCategory.id)}
+                alt={activeCategory.name}
+                className="h-full w-full object-cover object-center"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Breadcrumb path */}
+        <div className="flex flex-wrap items-center gap-1.5 text-xs text-stone-500 mb-6 pt-2 select-none border-b border-gray-100 pb-2.5">
+          <button onClick={() => { setSelectedCategory(null); setView('home'); }} className="hover:text-[#8C6845] transition">
+            Accueil
+          </button>
+          <span className="text-stone-300 font-mono text-[9px]">&gt;</span>
+          <button onClick={() => { setSelectedCategory(null); setView('shop'); }} className={selectedCategoryId ? "hover:text-[#8C6845] transition" : "text-[#8C6845] font-semibold"}>
+            Boutique
+          </button>
+          {activeCategory && (
+            <>
+              <span className="text-stone-300 font-mono text-[9px]">&gt;</span>
+              <span className="text-[#8C6845] font-semibold">
+                {activeCategory.name}
+              </span>
+            </>
+          )}
+        </div>
 
         {!selectedCategoryId && (
           <div className="text-center space-y-2 mb-4 md:mb-5">
@@ -119,18 +220,6 @@ export const ShopView: React.FC = () => {
             <p className="text-sm sm:text-base text-stone-500 font-light max-w-md mx-auto leading-relaxed">
               {filteredProducts.length} produit{filteredProducts.length > 1 ? 's' : ''} — Cliquez pour personnaliser avec votre logo et couleurs
             </p>
-          </div>
-        )}
-
-        {activeCategory && (
-          <div className="-mx-4 mb-5 overflow-hidden rounded-[1.75rem] border border-white/70 bg-white/85 shadow-[0_10px_28px_rgba(166,124,82,0.10)] sm:-mx-6 lg:-mx-8">
-            <div className="relative h-[144px] sm:h-[160px] lg:h-[172px] overflow-hidden bg-[#F4E2D1]">
-              <img
-                src={getCategoryBannerSrc(activeCategory.id)}
-                alt={activeCategory.name}
-                className="h-full w-full object-cover object-center"
-              />
-            </div>
           </div>
         )}
 

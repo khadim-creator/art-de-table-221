@@ -57,26 +57,6 @@ export const categoriesPreset: Category[] = [
     ]
   },
   {
-    id: "gobelets-emballages-boissons",
-    name: "Gobelets & Emballages Boissons",
-    slug: "gobelets-emballages-boissons",
-    description: "Gobelets kraft, gobelets carton toutes tailles (200 ml à 500 ml), couvercles, pailles, bouteilles d'eau/jus personnalisées.",
-    image: getCategoryBannerSrc('gobelets-emballages-boissons'),
-    subcategories: [
-      "Gobelets 200 ml",
-      "Gobelets 250 ml",
-      "Gobelets 300 ml",
-      "Gobelets 350 ml",
-      "Gobelets 500 ml",
-      "Gobelets Kraft",
-      "Couvercles",
-      "Pailles",
-      "Bouteilles d'eau",
-      "Bouteilles de jus",
-      "Bouteilles personnalisées"
-    ]
-  },
-  {
     id: "bols-saladiers-pots",
     name: "Bols, Saladiers & Pots",
     slug: "bols-saladiers-pots",

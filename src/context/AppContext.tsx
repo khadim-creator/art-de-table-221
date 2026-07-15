@@ -35,15 +35,16 @@ const DEFAULT_SITE_SETTINGS = {
     {
       image: heroSlider2,
       artwork: heroArtwork1,
-      title: 'DONNEZ VIE À VOTRE communication.',
+      title: 'PROPULSEZ VOTRE MARQUE par l\'emballage.',
       highlight: 'Design professionnel',
-      subTitle: 'Des supports élégants pour valoriser votre image de marque.',
-      headlineTop: 'DONNEZ VIE À VOTRE',
-      headlineAccent: 'communication.',
-      body: 'Des supports élégants pour valoriser votre image de marque.',
+      subTitle: 'Des solutions de packaging personnalisées haut de gamme pour marquer durablement les esprits de vos clients.',
+      headlineTop: 'PROPULSEZ VOTRE MARQUE',
+      headlineAccent: "par l'emballage.",
+      headlineBottom: 'DESIGN UNIQUE & PRO',
+      body: 'Des solutions de packaging personnalisées haut de gamme pour marquer durablement les esprits de vos clients.',
       body2: '',
       meta: 'Packaging - emballage - personnalisation · 77 871 58 75',
-      btnText: 'Découvrir nos créations',
+      btnText: 'Découvrir',
       btnLink: 'catalog',
       features: ['DESIGN PROFESSIONNEL', 'IMPRESSION HAUTE QUALITÉ', 'PERSONNALISATION SUR MESURE', 'LIVRAISON RAPIDE'],
       imagePosition: '72% center',
@@ -52,13 +53,12 @@ const DEFAULT_SITE_SETTINGS = {
     {
       image: heroSlider1,
       artwork: heroArtwork2,
-      title: 'SUBLIMEZ vos produits ALIMENTAIRES.',
-      highlight: 'Emballages premium',
-      subTitle: 'Des emballages pratiques et personnalisables.',
-      headlineTop: 'SUBLIMEZ',
-      headlineAccent: 'vos produits',
-      headlineBottom: 'ALIMENTAIRES.',
-      body: 'Des emballages pratiques et personnalisables.',
+      title: 'SUBLIMEZ VOS CRÉATIONS.',
+      highlight: 'contenant & packaging',
+      subTitle: 'Contenants alimentaires esthétiques et certifiés, idéaux pour sublimer vos créations et fidéliser votre clientèle.',
+      headlineTop: 'SUBLIMEZ VOS CRÉATIONS',
+      headlineBottom: 'ALIMENTAIRES',
+      body: 'Contenants alimentaires esthétiques et certifiés, idéaux pour sublimer vos créations et fidéliser votre clientèle.',
       body2: '',
       meta: '',
       btnText: 'En savoir plus',
@@ -70,13 +70,13 @@ const DEFAULT_SITE_SETTINGS = {
     {
       image: heroSlider3,
       artwork: heroArtwork3,
-      title: 'TRANSFORMEZ CHAQUE ÉVÉNEMENT en souvenir inoubliable.',
+      title: 'MARQUEZ LES ESPRITS pour vos fêtes.',
       highlight: 'Événementiel',
-      subTitle: 'Des créations personnalisées pour vos événements.',
-      headlineTop: 'TRANSFORMEZ',
-      headlineBottom: 'CHAQUE ÉVÉNEMENT',
-      headlineAccent: 'en souvenir inoubliable.',
-      body: 'Des créations personnalisées pour vos événements.',
+      subTitle: 'Personnalisation exclusive d’accessoires raffinés et de cadeaux d’invités pour vos mariages et réceptions prestigieuses.',
+      headlineTop: 'MARQUEZ LES ESPRITS',
+      headlineBottom: 'PRESTIGE SUR-MESURE',
+      headlineAccent: 'pour vos fêtes.',
+      body: 'Personnalisation exclusive d’accessoires raffinés et de cadeaux d’invités pour vos mariages et réceptions prestigieuses.',
       body2: '',
       meta: '',
       btnText: 'Commander',
@@ -202,7 +202,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const hasInitialCatalogQuery = hasCatalogQueryState(initialCatalogQuery);
 
   // UI states
-  const [currentView, setCurrentView] = useState<string>(hasInitialCatalogQuery ? 'shop' : 'home');
+  const [currentView, setCurrentView] = useState<string>(() => {
+    if (typeof window === 'undefined') return 'home';
+    const params = new URLSearchParams(window.location.search);
+    const viewParam = params.get('view');
+    if (viewParam) return viewParam;
+    return hasInitialCatalogQuery ? 'shop' : 'home';
+  });
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(initialCatalogQuery.category);
   const [searchQueryState, setSearchQueryState] = useState<string>(initialCatalogQuery.q);
@@ -299,7 +305,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setSearchQueryState(nextState.q);
       setCatalogSortByState(nextState.sort);
       setCatalogMinQtyOnlyState(nextState.minQtyOnly);
-      setCurrentView(hasCatalogQueryState(nextState) ? 'shop' : 'home');
+
+      const params = new URLSearchParams(window.location.search);
+      const viewParam = params.get('view');
+      if (viewParam) {
+        setCurrentView(viewParam);
+      } else {
+        setCurrentView(hasCatalogQueryState(nextState) ? 'shop' : 'home');
+      }
     };
 
     const onPopState = () => {
@@ -324,7 +337,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       minQtyOnly: catalogMinQtyOnlyState,
     });
 
-    const nextUrl = `${window.location.pathname}${nextQuery ? `?${nextQuery}` : ''}${window.location.hash}`;
+    const params = new URLSearchParams(nextQuery);
+    if (currentView !== 'home' && currentView !== 'shop') {
+      params.set('view', currentView);
+    }
+    const finalQuery = params.toString();
+
+    const nextUrl = `${window.location.pathname}${finalQuery ? `?${finalQuery}` : ''}${window.location.hash}`;
     const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
     if (nextUrl === currentUrl) return;
 

@@ -877,82 +877,133 @@ export const AdminDashboardView: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] flex flex-col md:flex-row text-left font-sans">
+    <div className="min-h-screen bg-[#F8FAFC] flex flex-col md:flex-row text-left font-sans">
       
       {/* 1. LEFT SIDEBAR Layout on desktop, collapsed mobile drawer */}
-      <aside className={`w-full md:w-72 bg-[#111111] text-[#FAF6F0] flex flex-col shrink-0 border-b md:border-b-0 md:border-r border-[#D4AF37]/15 z-20 ${mobileMenuOpen ? 'block' : 'hidden md:flex'}`}>
+      <aside className={`w-full md:w-72 bg-[#0F172A] text-slate-300 flex flex-col shrink-0 border-b md:border-b-0 md:border-r border-slate-800 z-20 ${mobileMenuOpen ? 'block' : 'hidden md:flex'}`}>
         
         {/* Brand Header */}
-        <div className="p-6 md:p-8 border-b border-stone-800 flex items-center justify-between">
+        <div className="p-6 md:p-8 border-b border-slate-800 flex items-center justify-between">
           <div className="space-y-1">
             <h1 className="text-xl font-serif font-black tracking-wider text-white flex items-center space-x-2">
-              <span className="text-[#D4AF37] font-sans">✦</span>
+              <span className="text-[#C5A880] font-sans">✦</span>
               <span>ART DE TABLE</span>
             </h1>
-            <p className="text-[10px] text-[#C9B097] font-mono tracking-widest uppercase">Atelier d'Exception</p>
+            <p className="text-[10px] text-slate-400 font-mono tracking-widest uppercase">Atelier d'Exception</p>
           </div>
           <button 
             onClick={() => setMobileMenuOpen(false)} 
-            className="md:hidden text-stone-400 hover:text-white"
+            className="md:hidden text-slate-400 hover:text-white"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* User Identity widget */}
-        <div className="px-6 py-4 border-b border-stone-800 bg-[#161616] flex items-center space-x-3 text-stone-300">
-          <div className="w-10 h-10 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/35 flex items-center justify-center font-bold font-serif text-[#D4AF37]">
+        <div className="px-6 py-4 border-b border-slate-800 bg-[#1E293B] flex items-center space-x-3 text-slate-350">
+          <div className="w-10 h-10 rounded-full bg-[#C5A880]/10 border border-[#C5A880]/30 flex items-center justify-center font-bold font-serif text-[#C5A880]">
             {currentUser?.displayName ? currentUser.displayName[0].toUpperCase() : 'A'}
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-xs font-bold text-white truncate">{currentUser?.displayName || 'Dakar Admin'}</p>
-            <p className="text-[10px] text-stone-400 font-mono truncate">{currentUser?.email}</p>
+            <p className="text-[10px] text-slate-400 font-mono truncate">{currentUser?.email}</p>
           </div>
         </div>
 
-        {/* Vertical Nav links */}
-        <nav className="p-4 flex-1 space-y-1 overflow-y-auto no-scrollbar">
-          {[
-            { id: 'dashboard', label: 'Rapports & KPI', icon: TrendingUp },
-            { id: 'products', label: 'Echantillons (Stock)', icon: Archive },
-            { id: 'orders', label: 'Registre Commandes', icon: ClipboardList },
-            { id: 'quotes', label: 'Cahiers des charges (Devis)', icon: Key },
-            { id: 'promotions', label: 'Bannières & Coupons', icon: Percent },
-            { id: 'clients', label: 'Annuaire Clients (CRM)', icon: User },
-            { id: 'content', label: 'CMS Editeur Textes', icon: Settings },
-          ].map((tab) => {
-            const Icon = tab.icon;
-            const isSelected = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => { setActiveTab(tab.id as any); setPrintingOrder(null); setMobileMenuOpen(false); }}
-                className={`w-full py-3 px-4 rounded-xl font-mono text-xs tracking-wide flex items-center space-x-3 transition cursor-pointer text-left ${
-                  isSelected
-                    ? 'bg-[#222222] text-[#D4AF37] border-l-4 border-[#D4AF37] font-bold shadow-sm'
-                    : 'text-stone-400 hover:text-white hover:bg-stone-800/50'
-                }`}
-              >
-                <Icon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-[#D4AF37]' : 'text-stone-400'}`} />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
+        {/* Vertical Nav links (Grouped & Reorganized) */}
+        <nav className="p-4 flex-1 space-y-6 overflow-y-auto no-scrollbar">
+          
+          <div className="space-y-1">
+            <p className="px-3 text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Activités & Devis</p>
+            {[
+              { id: 'dashboard', label: 'Rapports & KPI', icon: TrendingUp },
+              { id: 'orders', label: 'Registre Commandes', icon: ClipboardList },
+              { id: 'quotes', label: 'Cahiers des charges (Devis)', icon: Key },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const isSelected = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => { setActiveTab(tab.id as any); setPrintingOrder(null); setMobileMenuOpen(false); }}
+                  className={`w-full py-2.5 px-3.5 rounded-xl font-mono text-[11px] tracking-wide flex items-center space-x-3 transition cursor-pointer text-left ${
+                    isSelected
+                      ? 'bg-slate-800 text-white font-bold border-l-4 border-[#C5A880] shadow-sm'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                  }`}
+                >
+                  <Icon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-[#C5A880]' : 'text-slate-400'}`} />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="space-y-1">
+            <p className="px-3 text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Offres & Catalogue</p>
+            {[
+              { id: 'products', label: 'Echantillons (Stock)', icon: Archive },
+              { id: 'promotions', label: 'Coupons de réduction', icon: Percent },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const isSelected = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => { setActiveTab(tab.id as any); setPrintingOrder(null); setMobileMenuOpen(false); }}
+                  className={`w-full py-2.5 px-3.5 rounded-xl font-mono text-[11px] tracking-wide flex items-center space-x-3 transition cursor-pointer text-left ${
+                    isSelected
+                      ? 'bg-slate-800 text-white font-bold border-l-4 border-[#C5A880] shadow-sm'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                  }`}
+                >
+                  <Icon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-[#C5A880]' : 'text-slate-400'}`} />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="space-y-1">
+            <p className="px-3 text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Configuration & CRM</p>
+            {[
+              { id: 'clients', label: 'Annuaire Clients (CRM)', icon: User },
+              { id: 'content', label: 'CMS Editeur Textes', icon: Settings },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const isSelected = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => { setActiveTab(tab.id as any); setPrintingOrder(null); setMobileMenuOpen(false); }}
+                  className={`w-full py-2.5 px-3.5 rounded-xl font-mono text-[11px] tracking-wide flex items-center space-x-3 transition cursor-pointer text-left ${
+                    isSelected
+                      ? 'bg-slate-800 text-white font-bold border-l-4 border-[#C5A880] shadow-sm'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                  }`}
+                >
+                  <Icon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-[#C5A880]' : 'text-slate-400'}`} />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
         </nav>
 
         {/* Bottom utility rules */}
-        <div className="p-4 border-t border-stone-800 space-y-2 mt-auto">
+        <div className="p-4 border-t border-slate-800 space-y-2 mt-auto">
           <button
             onClick={() => setView('shop')}
-            className="w-full bg-[#FAF6F0]/5 hover:bg-[#FAF6F0]/10 text-stone-300 py-3 rounded-xl border border-stone-800 text-xs font-semibold tracking-wider uppercase transition cursor-pointer flex items-center justify-center space-x-2"
+            className="w-full bg-slate-850 hover:bg-slate-800 text-white py-3 rounded-xl border border-slate-750 text-xs font-semibold tracking-wider uppercase transition cursor-pointer flex items-center justify-center space-x-2"
           >
-            <ShoppingBag className="w-3.5 h-3.5" />
+            <ShoppingBag className="w-3.5 h-3.5 text-[#C5A880]" />
             <span>Aller sur le magasin</span>
           </button>
           
           <button
             onClick={handleDeAuthLogout}
-            className="w-full hover:bg-stone-900 text-red-400 hover:text-red-300 py-2.5 rounded-xl text-[11px] font-mono flex items-center justify-center space-x-1.5 transition cursor-pointer"
+            className="w-full hover:bg-slate-800/50 text-red-400 hover:text-red-300 py-2.5 rounded-xl text-[11px] font-mono flex items-center justify-center space-x-1.5 transition cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Verrouiller l'Atelier</span>
@@ -962,13 +1013,13 @@ export const AdminDashboardView: React.FC = () => {
       </aside>
 
       {/* Mobile Sticky Navbar */}
-      <div className="w-full md:hidden bg-[#111111] p-4 flex justify-between items-center z-13 sticky top-0 border-b border-[#D4AF37]/20 select-none">
+      <div className="w-full md:hidden bg-[#0F172A] p-4 flex justify-between items-center z-13 sticky top-0 border-b border-slate-800 select-none">
         <h2 className="text-white font-serif font-black text-sm tracking-widest uppercase">Art de Table Backoffice</h2>
         <button 
           onClick={() => setMobileMenuOpen(true)} 
-          className="text-[#FAF6F0] p-1 rounded-lg bg-stone-900 border border-stone-750"
+          className="text-slate-300 p-1 rounded-lg bg-slate-800 border border-slate-700"
         >
-          <Menu className="w-5 h-5 text-[#D4AF37]" />
+          <Menu className="w-5 h-5 text-[#C5A880]" />
         </button>
       </div>
 
@@ -976,10 +1027,10 @@ export const AdminDashboardView: React.FC = () => {
       <main className="flex-1 min-w-0 p-4 sm:p-8 lg:p-10 space-y-8 overflow-y-auto max-h-screen">
         
         {/* Banner Title */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-[#D4AF37]/10 pb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 pb-6">
           <div className="space-y-1">
-            <div className="inline-flex items-center space-x-2 bg-[#FAF6F0] border border-[#D4AF37]/35 px-3 py-1 rounded-full text-[#D4AF37] text-[10px] font-mono uppercase tracking-widest font-bold">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#D4AF37]" />
+            <div className="inline-flex items-center space-x-2 bg-slate-100 border border-slate-250 px-3 py-1 rounded-full text-slate-700 text-[10px] font-mono uppercase tracking-widest font-bold">
+              <ShieldCheck className="w-3.5 h-3.5 text-slate-500" />
               <span>Système ERP Principal</span>
             </div>
             <h1 className="text-2xl sm:text-4xl font-serif font-black text-neutral-900">
@@ -987,7 +1038,7 @@ export const AdminDashboardView: React.FC = () => {
               {activeTab === 'products' && "Catalogue d'Échantillons & Stocks"}
               {activeTab === 'orders' && "Registre des Commandes Client"}
               {activeTab === 'quotes' && "Cahiers des charges de Devis"}
-              {activeTab === 'promotions' && "Gestion des coupons et rabais"}
+              {activeTab === 'promotions' && "Gestion des Coupons & Codes"}
               {activeTab === 'clients' && "Fichiers & CRM Clientèle"}
               {activeTab === 'content' && "CMS - Édition d'univers"}
             </h1>
@@ -997,10 +1048,10 @@ export const AdminDashboardView: React.FC = () => {
             <div className="flex items-center space-x-2 self-stretch sm:self-auto">
               <button
                 onClick={handleReseedDb}
-                className="bg-amber-50 hover:bg-amber-100/80 border border-[#D4AF37]/45 text-yellow-850 text-xs font-mono py-2.5 px-4 rounded-xl transition flex items-center space-x-2 cursor-pointer w-full sm:w-auto justify-center"
+                className="bg-[#C5A880]/15 hover:bg-[#C5A880]/25 border border-[#C5A880]/35 text-[#8C6845] text-xs font-mono py-2.5 px-4 rounded-xl transition flex items-center space-x-2 cursor-pointer w-full sm:w-auto justify-center font-bold"
                 title="Restaurer le catalogue d'exception avec 112 produits"
               >
-                <RefreshCw className="w-3.5 h-3.5 text-[#D4AF37]" />
+                <RefreshCw className="w-3.5 h-3.5 text-[#8C6845]" />
                 <span>Restaurer l'univers d'or (112 prods)</span>
               </button>
             </div>
@@ -1011,43 +1062,43 @@ export const AdminDashboardView: React.FC = () => {
         {activeTab === 'dashboard' && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             
-            <div className="bg-white p-6 rounded-3xl border border-stone-200/60 shadow-sm flex items-center space-x-4">
-              <span className="p-3.5 bg-green-50 rounded-2xl text-green-600">
+            <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center space-x-4">
+              <span className="p-3.5 bg-emerald-50 rounded-2xl text-emerald-600">
                 <DollarSign className="w-6 h-6" />
               </span>
               <div>
-                <p className="text-[10px] font-mono text-stone-400 uppercase tracking-widest">Revenus Totaux</p>
+                <p className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Revenus Totaux</p>
                 <p className="font-serif text-xl sm:text-2xl font-black text-neutral-900">{stats.turnover.toLocaleString()} F</p>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-3xl border border-stone-200/60 shadow-sm flex items-center space-x-4">
-              <span className="p-3.5 bg-amber-50 rounded-2xl text-[#D4AF37]">
+            <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center space-x-4">
+              <span className="p-3.5 bg-blue-50 rounded-2xl text-blue-600">
                 <ClipboardList className="w-6 h-6" />
               </span>
               <div>
-                <p className="text-[10px] font-mono text-stone-400 uppercase tracking-widest">Demandes Reçues</p>
+                <p className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Demandes Reçues</p>
                 <p className="font-serif text-xl sm:text-2xl font-black text-neutral-900">{stats.totalOrdersCount + stats.totalQuotesCount}</p>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-3xl border border-stone-200/60 shadow-sm flex items-center space-x-4">
-              <span className="p-3.5 bg-stone-50 rounded-2xl text-stone-650">
+            <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center space-x-4">
+              <span className="p-3.5 bg-purple-50 rounded-2xl text-purple-600">
                 <Archive className="w-6 h-6" />
               </span>
               <div>
-                <p className="text-[10px] font-mono text-stone-400 uppercase tracking-widest">En cours atelier</p>
+                <p className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">En cours atelier</p>
                 <p className="font-serif text-xl sm:text-2xl font-black text-neutral-900">{stats.pendingOrdersCount + stats.productionOrdersCount}</p>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-3xl border border-stone-200/60 shadow-sm flex items-center space-x-4">
-              <span className="p-3.5 bg-red-50 rounded-2xl text-red-550">
+            <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center space-x-4">
+              <span className="p-3.5 bg-rose-50 rounded-2xl text-rose-600">
                 <AlertTriangle className="w-6 h-6" />
               </span>
               <div>
-                <p className="text-[10px] font-mono text-stone-400 uppercase tracking-widest">Alerte ruptures</p>
-                <p className="font-serif text-xl sm:text-2xl font-black text-red-650">{lowStockProducts.length} articles</p>
+                <p className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Alerte ruptures</p>
+                <p className="font-serif text-xl sm:text-2xl font-black text-rose-600">{lowStockProducts.length} articles</p>
               </div>
             </div>
 
@@ -1506,22 +1557,7 @@ export const AdminDashboardView: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="space-y-1 sm:col-span-4">
-                      <div className="flex items-center justify-between">
-                        <label className="font-mono text-[10px] text-stone-500 block">Lien de la Vidéo d'Atelier (TikTok ou MP4 avec Son)</label>
-                        <span className="bg-[#FAF0E6] text-[#8B3A52] px-1.5 py-0.5 rounded-md font-mono text-[8px] font-bold">SON INTÉGRÉ</span>
-                      </div>
-                      <input
-                        type="text"
-                        value={productForm.videoUrl || ''}
-                        onChange={e => setProductForm({ ...productForm, videoUrl: e.target.value })}
-                        placeholder="Ex: https://www.tiktok.com/@artdetable.sn/video/1234567890 ou lien direct MP4"
-                        className="w-full px-3 py-2 bg-white rounded-xl border border-stone-200 outline-none focus:border-[#D4AF37]"
-                      />
-                      <span className="text-[9px] text-[#8B3A52] font-medium leading-normal block">
-                        💡 Remplace l'illustration SVG classique sur le catalogue par une présentation vidéo dynamique de haute qualité avec son !
-                      </span>
-                    </div>
+
                   </div>
                   <div className="flex justify-end pt-2">
                     <button type="submit" className="bg-[#111111] hover:bg-black text-[#FAF6F0] font-mono text-xs uppercase tracking-widest px-6 py-3 rounded-xl shadow border border-[#D4AF37]/15 cursor-pointer font-bold">
@@ -1884,19 +1920,7 @@ export const AdminDashboardView: React.FC = () => {
                                       </div>
                                     </div>
                                   </div>
-                                  <div className="space-y-1 sm:col-span-2">
-                                    <div className="flex items-center justify-between">
-                                      <label className="font-mono text-[9px] text-[#8B3A52] font-bold block">Vidéo d'Atelier (TikTok ou MP4)</label>
-                                      <span className="bg-[#FAF0E6] text-[#8B3A52] px-1 py-0.5 rounded-md font-mono text-[7px] font-bold">SON INCLUS</span>
-                                    </div>
-                                    <input
-                                      type="text"
-                                      value={inlineEditForm.videoUrl || ''}
-                                      onChange={e => setInlineEditForm({ ...inlineEditForm, videoUrl: e.target.value })}
-                                      placeholder="TikTok ou lien MP4 avec Musique"
-                                      className="w-full px-3 py-2 bg-[#FAF9F6] rounded-xl border border-stone-200 outline-none focus:border-[#D4AF37]"
-                                    />
-                                  </div>
+
                                   <div className="space-y-1 sm:col-span-4">
                                     <label className="font-mono text-[9px] text-stone-500 font-bold block">Description de l'Artisanat d'Atelier *</label>
                                     <textarea
@@ -2260,7 +2284,7 @@ export const AdminDashboardView: React.FC = () => {
         {activeTab === 'promotions' && (
           <div className="space-y-6">
             <div className="bg-white p-6 rounded-3xl border border-stone-200/50 shadow-sm text-left space-y-1">
-              <h3 className="font-serif text-lg font-bold text-neutral-900">Bannières & Coupons d'Atelier</h3>
+              <h3 className="font-serif text-lg font-bold text-neutral-900">Coupons de réduction d'Atelier</h3>
               <p className="text-xs text-stone-400 font-light">Gérez les codes promotionnels pour les célébrations d'exception.</p>
             </div>
 
@@ -2411,55 +2435,7 @@ export const AdminDashboardView: React.FC = () => {
               </div>
             </form>
 
-            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-stone-200/50 shadow-sm space-y-6 text-left border-t-2 border-t-[#D4AF37]">
-              <div className="space-y-1 border-b border-stone-100 pb-4">
-                <h3 className="font-serif text-lg font-bold text-neutral-900">Bannières des catégories</h3>
-                <p className="text-xs text-stone-400 font-light">Chaque image alimente la grande bannière de la boutique lorsqu’une catégorie est sélectionnée.</p>
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {categories.map((cat) => (
-                  <div key={cat.id} className="rounded-2xl border border-stone-200 bg-[#FAF9F6] p-4 space-y-3">
-                    <div className="flex items-start gap-3">
-                      <img
-                        src={categoryImageDrafts[cat.id] || cat.image || 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&q=80&w=900'}
-                        alt={cat.name}
-                        className="w-20 h-20 rounded-xl object-cover border border-white shadow-sm shrink-0"
-                      />
-                      <div className="min-w-0">
-                        <p className="font-semibold text-sm text-neutral-900">{cat.name}</p>
-                        <p className="text-[11px] text-stone-400">Image de bannière modifiable</p>
-                      </div>
-                    </div>
-
-                    <input
-                      type="text"
-                      value={categoryImageDrafts[cat.id] ?? cat.image ?? ''}
-                      onChange={(e) => setCategoryImageDrafts(prev => ({ ...prev, [cat.id]: e.target.value }))}
-                      className="w-full p-3 border border-stone-200 rounded-xl outline-none focus:border-[#D4AF37] bg-white text-xs"
-                      placeholder="Coller l'URL de l'image"
-                    />
-
-                    <div className="flex justify-end">
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          try {
-                            await adminEditCategory(cat.id, { image: categoryImageDrafts[cat.id] || cat.image });
-                            alert(`Bannière mise à jour pour ${cat.name}.`);
-                          } catch (err) {
-                            alert("Impossible de mettre à jour cette bannière.");
-                          }
-                        }}
-                        className="bg-[#111111] hover:bg-black text-[#FAF6F0] text-[10px] font-mono uppercase tracking-widest font-bold px-4 py-2.5 rounded-xl cursor-pointer shadow border border-[#D4AF37]/15"
-                      >
-                        Enregistrer
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
 
             {/* Central Media Library and Slides CMS Console */}
             <AdminMediaLibrary />

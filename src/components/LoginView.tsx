@@ -132,7 +132,8 @@ export const LoginView: React.FC = () => {
                         value={name}
                         onChange={e => setName(e.target.value)}
                         placeholder="Ex: Alassane Sy"
-                        className="form-input pl-14"
+                        className="form-input"
+                        style={{ paddingLeft: '3.5rem' }}
                       />
                       <User className="absolute left-4 top-1/2 icon-sm -translate-y-1/2 text-gray-400" />
                     </div>
@@ -149,7 +150,8 @@ export const LoginView: React.FC = () => {
                       value={email}
                       onChange={e => setEmail(e.target.value)}
                       placeholder="Ex: client@gmail.com"
-                      className="form-input pl-14"
+                      className="form-input"
+                      style={{ paddingLeft: '3.5rem' }}
                     />
                     <Mail className="absolute left-4 top-1/2 icon-sm -translate-y-1/2 text-gray-400" />
                   </div>
@@ -177,7 +179,8 @@ export const LoginView: React.FC = () => {
                       value={password}
                       onChange={e => setPassword(e.target.value)}
                       placeholder="Minimum 6 caractères"
-                      className="form-input pl-14"
+                      className="form-input"
+                      style={{ paddingLeft: '3.5rem' }}
                     />
                     <Lock className="absolute left-4 top-1/2 icon-sm -translate-y-1/2 text-gray-400" />
                   </div>

@@ -85,11 +85,13 @@ service cloud.firestore {
 
     // Rules for collections
     match /products/{productId} {
-      allow read, write: if true;
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
     match /categories/{categoryId} {
-      allow read, write: if true;
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
     match /orders/{orderId} {
@@ -113,12 +115,12 @@ service cloud.firestore {
 
     match /testimonials/{testimonialId} {
       allow read: if true;
-      allow write: if true;
+      allow write: if isAdmin() || (isSignedIn() && isValidTestimonial(incoming()));
     }
 
     match /promotions/{promoId} {
       allow read: if true;
-      allow write: if true;
+      allow write: if isAdmin();
     }
 
     match /stockHistory/{logId} {

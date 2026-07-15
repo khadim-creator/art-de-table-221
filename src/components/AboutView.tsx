@@ -1,12 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Award, Heart, CheckCircle2, Gem } from 'lucide-react';
 import { QuoteRequestView } from './QuoteRequestView';
 
 export const AboutView: React.FC = () => {
+  useEffect(() => {
+    document.title = "À propos de nous - Art de Table Sénégal";
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) {
+      metaDesc.setAttribute('content', 'Découvrez Art de Table : atelier premium de personnalisation événementielle, emballages de luxe et sacs personnalisés à Dakar, Sénégal.');
+    }
+  }, []);
+
   return (
     <main className="min-h-screen bg-transparent pt-6 md:pt-10 text-left">
       {/* Hero Section */}
-      <section className="relative overflow-hidden section-spacer bg-gradient-to-b from-[#FAF9F9] via-white to-[#FAF9F9]">
+      <section className="relative overflow-hidden section-spacer bg-white">
         <div className="section-container relative z-10">
           <div className="max-w-3xl space-y-6">
             <span className="text-[10px] sm:text-xs font-mono uppercase tracking-widest text-[#D4AF37] font-bold py-1.5 px-4 bg-[#FDFBF7] rounded-full border border-[#F3E5AB]">
@@ -63,7 +71,7 @@ export const AboutView: React.FC = () => {
       </section>
 
       {/* Mission, Vision, Values Block */}
-      <section className="section-spacer bg-transparent">
+      <section className="section-spacer bg-white">
         <div className="section-container">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             

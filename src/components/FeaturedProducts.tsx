@@ -3,16 +3,23 @@ import { useApp } from '../context/AppContext';
 import { ArrowRight } from 'lucide-react';
 import { ProductCard } from './ProductCard';
 import quoteCardImage from '../assets/images/art_de_table_brochure_1780829818884.png';
+import { EXCLUDED_CATEGORY_IDS } from '../constants/categories';
 
 export const FeaturedProducts: React.FC = () => {
   const { products, setSelectedProduct, setView } = useApp();
 
   const feed = products
-    .filter(p => p && typeof p.id === 'string' && typeof p.name === 'string')
+    .filter(p => p && typeof p.id === 'string' && typeof p.name === 'string' && typeof p.category === 'string' && !EXCLUDED_CATEGORY_IDS.includes(p.category))
     .sort((a, b) => {
-      const featuredScore = Number(!!(b as any).produit_mis_en_avant) - Number(!!(a as any).produit_mis_en_avant);
+      const scoreB = b.produit_mis_en_avant ? 1 : 0;
+      const scoreA = a.produit_mis_en_avant ? 1 : 0;
+      const featuredScore = scoreB - scoreA;
       if (featuredScore !== 0) return featuredScore;
-      return (b.rating - a.rating) || (b.reviewsCount - a.reviewsCount);
+      const ratingB = typeof b.rating === 'number' ? b.rating : 0;
+      const ratingA = typeof a.rating === 'number' ? a.rating : 0;
+      const reviewsB = typeof b.reviewsCount === 'number' ? b.reviewsCount : 0;
+      const reviewsA = typeof a.reviewsCount === 'number' ? a.reviewsCount : 0;
+      return (ratingB - ratingA) || (reviewsB - reviewsA);
     })
     .slice(0, 12);
 

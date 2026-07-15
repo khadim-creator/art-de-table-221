@@ -24,15 +24,6 @@ const categories = [
     ],
   },
   {
-    label: 'Gobelets & Boissons',
-    slug: 'gobelets-boissons',
-    subcategories: [
-      { label: 'Gobelets', slug: 'gobelets' },
-      { label: 'Bouteilles', slug: 'bouteilles' },
-      { label: 'Accessoires', slug: 'accessoires-boissons' },
-    ],
-  },
-  {
     label: 'Bols & Pots',
     slug: 'bols-pots',
     subcategories: [
@@ -154,13 +145,29 @@ export const Navbar: React.FC = () => {
     if (view === 'contact') {
       setView('home');
       setTimeout(() => {
-        const el = document.getElementById('footer-section');
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-        else window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        try {
+          const el = document.getElementById('footer-section');
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+          else window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        } catch (e) {
+          try {
+            window.scrollTo(0, document.body.scrollHeight);
+          } catch (err) {
+            console.warn("Scroll failed", err);
+          }
+        }
       }, 150);
     } else {
       setView(view);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      try {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (e) {
+        try {
+          window.scrollTo(0, 0);
+        } catch (err) {
+          console.warn("Scroll failed", err);
+        }
+      }
     }
   };
 
@@ -168,14 +175,30 @@ export const Navbar: React.FC = () => {
     setMobileMenuOpen(false);
     setSelectedCategory(slug);
     setView('shop');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (e) {
+      try {
+        window.scrollTo(0, 0);
+      } catch (err) {
+        console.warn("Scroll failed", err);
+      }
+    }
   };
 
   const goToHome = () => {
     setMobileMenuOpen(false);
     setSelectedCategory(null);
-    setView('shop');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setView('home');
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (e) {
+      try {
+        window.scrollTo(0, 0);
+      } catch (err) {
+        console.warn("Scroll failed", err);
+      }
+    }
   };
 
   return (
@@ -184,17 +207,22 @@ export const Navbar: React.FC = () => {
         className="fixed top-0 left-0 right-0 z-50 border-b border-[#A67C52]/14 bg-white shadow-[0_10px_30px_rgba(166,124,82,0.09)] backdrop-blur-md"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-3 md:gap-5 h-[6.2rem] md:h-[6.8rem]">
-            <button
-              aria-label="Ouvrir le menu"
-              className="md:hidden shrink-0 w-11 h-11 flex items-center justify-center text-[#6A5830] hover:text-[#8C6845] transition"
-              onClick={() => setMobileMenuOpen(true)}
-            >
-              <Menu className="w-6 h-6" />
-            </button>
+          {/* Desktop header layout */}
+          <div className="hidden md:grid md:grid-cols-3 items-center h-[6.8rem] w-full">
+            {/* Left: Logo */}
+            <div className="flex items-center justify-start">
+              <button onClick={() => goTo('home')} className="group shrink-0" aria-label="Retour à l'accueil">
+                <img
+                  src={logoImg}
+                  alt="Art de Table"
+                  className="h-[6.3rem] w-[6.3rem] object-contain transition-transform duration-200 group-hover:scale-105"
+                />
+              </button>
+            </div>
 
-            <div className="hidden md:flex flex-1 items-center gap-3 min-w-0">
-              <div className="relative w-full max-w-[26rem]">
+            {/* Center: Search Bar */}
+            <div className="flex items-center justify-center">
+              <div className="relative w-full max-w-[22rem]">
                 <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8C6845]" />
                 <input
                   type="text"
@@ -205,81 +233,96 @@ export const Navbar: React.FC = () => {
                     setView('shop');
                   }}
                   onFocus={() => setView('shop')}
-                  placeholder="Rechercher un produit, une catégorie..."
-                  className="h-[3.1rem] w-full rounded-none border border-[#A67C52]/18 bg-white pl-11 pr-4 text-[15px] text-[#2A1B13] placeholder:text-stone-400 shadow-sm outline-none transition focus:border-[#A67C52]/35 focus:ring-2 focus:ring-[#A67C52]/10"
+                  placeholder="Rechercher un produit..."
+                  className="h-[3.1rem] w-full rounded-none border border-[#A67C52]/18 bg-white pl-11 pr-4 text-[15px] text-[#2A1B13] placeholder:text-stone-400 shadow-sm outline-none transition focus:border-[#A67C52]/35 focus:ring-2 focus:ring-[#A67C52]/10 font-bold"
                   aria-label="Recherche"
                 />
               </div>
             </div>
 
-            <div className="hidden md:flex items-center gap-1 sm:gap-2 shrink-0">
-              {currentUser ? (
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => setView('dashboard')}
-                    className="hidden sm:flex items-center gap-1.5 h-[3.1rem] px-5 rounded-full bg-[#FFF9F4] border border-[#A67C52]/18 transition text-[14px] text-[#4B3A22] font-medium hover:bg-[#FFF4EA]"
-                  >
-                    <User className="w-5 h-5" />
-                    <span className="hidden lg:inline">Mon compte</span>
-                  </button>
-                  {(currentUser?.isAdmin || currentUser?.email?.toLowerCase() === 'khadxxm05@gmail.com') && (
-                    <button
-                      onClick={() => setView('admin-dashboard')}
-                      className="hidden sm:flex h-[3.1rem] w-[3.1rem] items-center justify-center rounded-full border border-[#A67C52]/18 bg-[#FFF9F4] text-[#4B3A22] hover:bg-[#FFF4EA] transition"
-                      aria-label="Administration"
-                    >
-                      <ShieldCheck className="w-5 h-5" />
-                    </button>
-                  )}
-                  <button onClick={logout} className="w-[3.1rem] h-[3.1rem] flex items-center justify-center text-[#4B3A22] hover:bg-[#FFF4EA] transition rounded-full">
-                    <LogOut className="w-5 h-5" />
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => setView('login')}
-                  className="hidden sm:flex h-[3.1rem] w-[3.1rem] items-center justify-center rounded-full bg-[#FFF9F4] border border-[#A67C52]/18 transition text-[#4B3A22] hover:bg-[#FFF4EA]"
-                  aria-label="Administration"
-                >
-                  <User className="w-5 h-5" />
-                </button>
-              )}
+            {/* Right: Actions */}
+            <div className="flex items-center justify-end gap-3.5">
+              {/* Connexion Button (only User icon, no text, navbar bg) */}
+              <button
+                onClick={() => setView(currentUser ? 'dashboard' : 'login')}
+                className="flex h-[2.8rem] w-[2.8rem] items-center justify-center rounded-full bg-[#8C6845] text-white hover:bg-[#8C6845]/90 transition"
+                aria-label="Connexion"
+              >
+                <User className="w-5 h-5" />
+              </button>
+
+              {/* Cart Button (ShoppingBag icon, no text, navbar bg, spaced from login) */}
               <button
                 onClick={() => setView('cart')}
-                className="relative flex h-[3.1rem] w-[3.1rem] items-center justify-center rounded-full bg-[#FFF9F4] border border-[#A67C52]/18 transition text-[#4B3A22] hover:bg-[#FFF4EA]"
+                className="relative flex h-[2.8rem] w-[2.8rem] items-center justify-center rounded-full bg-[#8C6845] text-white hover:bg-[#8C6845]/90 transition"
                 aria-label="Panier"
               >
                 <ShoppingBag className="w-5 h-5" />
                 {totalCartCount > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 inline-flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-[#8B3A52] text-[11px] font-black leading-none text-white shadow-[0_6px_16px_rgba(139,58,82,0.4)]">
+                  <span className="absolute -top-1 -right-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#8B3A52] text-[10px] font-black leading-none text-white border-2 border-[#8C6845]">
                     {totalCartCount}
                   </span>
                 )}
               </button>
-            </div>
 
-            <button onClick={() => goTo('home')} className="shrink-0 group ml-auto" aria-label="Retour à l'accueil">
+              {/* Administration */}
+              {currentUser && (currentUser?.isAdmin || currentUser?.email?.toLowerCase() === 'khadxxm05@gmail.com') && (
+                <button
+                  onClick={() => setView('admin-dashboard')}
+                  className="flex h-[2.8rem] w-[2.8rem] items-center justify-center rounded-full bg-[#8C6845] text-white hover:bg-[#8C6845]/90 transition"
+                  aria-label="Administration"
+                >
+                  <ShieldCheck className="w-5 h-5" />
+                </button>
+              )}
+
+              {/* Déconnexion */}
+              {currentUser && (
+                <button
+                  onClick={logout}
+                  className="flex h-[2.8rem] w-[2.8rem] items-center justify-center rounded-full bg-[#8C6845] text-white hover:bg-[#8C6845]/90 transition"
+                  aria-label="Déconnexion"
+                >
+                  <LogOut className="w-5 h-5" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Mobile layout */}
+          <div className="flex md:hidden items-center justify-between h-[6.2rem] w-full">
+            <button
+              aria-label="Ouvrir le menu"
+              className="shrink-0 w-11 h-11 flex items-center justify-center text-[#6A5830] hover:text-[#8C6845] transition"
+              onClick={() => setMobileMenuOpen(true)}
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+
+            <button onClick={() => goTo('home')} className="shrink-0 group" aria-label="Retour à l'accueil">
               <img
                 src={logoImg}
                 alt="Art de Table"
-                className="h-[4.9rem] w-[4.9rem] object-contain md:h-[6.3rem] md:w-[6.3rem]"
+                className="h-[4.9rem] w-[4.9rem] object-contain"
               />
             </button>
 
+            {/* Empty space to center the logo */}
+            <div className="w-11 h-11" />
           </div>
         </div>
       </header>
 
       <nav className="fixed top-[6.2rem] left-0 right-0 z-40 hidden md:block border-b border-[#A67C52]/14 bg-[#8C6845]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-1.5 overflow-visible whitespace-nowrap py-2 scrollbar-none">
+          <div className="flex items-center justify-center gap-1.5 overflow-visible whitespace-nowrap py-2 scrollbar-none">
             <button
               type="button"
               onClick={goToHome}
-              className={`flex h-10 shrink-0 items-center gap-1.5 rounded-none border-b-2 px-3 text-[12px] font-semibold uppercase tracking-[0.18em] transition-all duration-200 ${
-                !selectedCategoryId && currentView === 'shop'
+              className={`flex h-10 shrink-0 items-center gap-1.5 rounded-none border-b-2 px-3 text-[12px] font-black uppercase tracking-[0.18em] transition-all duration-200 ${
+                currentView === 'home'
                   ? 'text-white border-white/80 bg-white/10'
-                  : 'text-white/80 border-transparent hover:text-white hover:bg-white/10 hover:border-white/40'
+                  : 'text-white/85 border-transparent hover:text-white hover:bg-white/10 hover:border-white/40'
               }`}
             >
               <Home className="w-3.5 h-3.5" />
@@ -291,7 +334,7 @@ export const Navbar: React.FC = () => {
             <div className="relative group shrink-0">
               <button
                 type="button"
-                className="flex h-10 items-center gap-1.5 rounded-none border-b-2 border-transparent px-3 text-[12px] font-semibold uppercase tracking-[0.18em] text-white/85 transition-all duration-200 hover:bg-white/10 hover:text-white hover:border-white/40"
+                className="flex h-10 items-center gap-1.5 rounded-none border-b-2 border-transparent px-3 text-[12px] font-black uppercase tracking-[0.18em] text-white/85 transition-all duration-200 hover:bg-white/10 hover:text-white hover:border-white/40"
               >
                 <Menu className="h-3.5 w-3.5" />
                 <span>Catalogue complet</span>
@@ -300,16 +343,16 @@ export const Navbar: React.FC = () => {
               <div className="pointer-events-none absolute left-0 top-full z-[60] mt-0.5 w-[min(78rem,calc(100vw-2rem))] translate-y-2 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100">
                 <div className="max-h-[calc(100vh-9rem)] overflow-y-auto border border-[#A67C52]/15 bg-white shadow-[0_24px_60px_rgba(140,104,69,0.16)]">
                   <div className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {categories.map((category) => (
+                    {categories.filter(c => !['gobelets-boissons', 'gobelets-emballages-boissons'].includes(c.slug)).map((category) => (
                       <div key={category.slug} className="border-b border-[#A67C52]/10 pb-3 last:border-b-0 lg:border-b-0 lg:pb-0">
                         <button
                           type="button"
                           onClick={() => goToCategory(category.slug)}
-                          className="text-left text-sm font-semibold uppercase tracking-[0.14em] text-[#2A1B13] hover:text-[#8C6845]"
+                          className="text-left text-sm font-black uppercase tracking-[0.14em] text-[#2A1B13] hover:text-[#8C6845]"
                         >
                           {category.label}
                         </button>
-                        <div className="mt-2 flex flex-wrap gap-x-2 gap-y-1 text-[11px] text-[#6A5830]">
+                        <div className="mt-2 flex flex-wrap gap-x-2 gap-y-1 text-[11px] text-[#6A5830] font-bold">
                           {category.subcategories.map((sub, index) => (
                             <React.Fragment key={sub.slug}>
                               <button
@@ -338,10 +381,10 @@ export const Navbar: React.FC = () => {
                   type="button"
                   onMouseDown={(e) => e.stopPropagation()}
                   onClick={() => goToCategory(link.slug)}
-                  className={`flex h-10 shrink-0 items-center rounded-none border-b-2 px-3 text-[12px] font-semibold uppercase tracking-[0.14em] transition-all duration-200 ${
+                  className={`flex h-10 shrink-0 items-center rounded-none border-b-2 px-3 text-[12px] font-black uppercase tracking-[0.14em] transition-all duration-200 ${
                     selectedCategoryId === link.slug && currentView === 'shop'
                       ? 'text-white border-white/80 bg-white/10'
-                      : 'text-white/80 border-transparent hover:text-white hover:bg-white/10 hover:border-white/40'
+                      : 'text-white/85 border-transparent hover:text-white hover:bg-white/10 hover:border-white/40'
                   }`}
                 >
                   {link.label}
@@ -350,13 +393,28 @@ export const Navbar: React.FC = () => {
               </React.Fragment>
             ))}
 
-            <span className="ml-auto" />
+            <span className="h-4 w-px shrink-0 bg-white/20" />
+
+            <button
+              type="button"
+              onMouseDown={(e) => e.stopPropagation()}
+              onClick={() => goTo('about')}
+              className={`flex h-10 shrink-0 items-center rounded-none border-b-2 px-3 text-[12px] font-black uppercase tracking-[0.14em] transition-all duration-200 ${
+                currentView === 'about'
+                  ? 'text-white border-white/80 bg-white/10'
+                  : 'text-white/85 border-transparent hover:text-white hover:bg-white/10 hover:border-white/40'
+              }`}
+            >
+              À propos
+            </button>
+
+            <span className="h-4 w-px shrink-0 bg-white/20" />
 
             <button
               type="button"
               onMouseDown={(e) => e.stopPropagation()}
               onClick={() => goTo('contact')}
-              className="flex h-10 shrink-0 items-center rounded-none border-b-2 border-transparent px-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-white/80 transition-all duration-200 hover:bg-white/10 hover:text-white hover:border-white/40"
+              className="flex h-10 shrink-0 items-center rounded-none border-b-2 border-transparent px-3 text-[12px] font-black uppercase tracking-[0.14em] text-white/85 transition-all duration-200 hover:bg-white/10 hover:text-white hover:border-white/40"
             >
               Contact
             </button>
@@ -398,20 +456,28 @@ export const Navbar: React.FC = () => {
             type="button"
             onMouseDown={(e) => e.stopPropagation()}
             onClick={goToHome}
-            className="w-full flex items-center gap-3 px-3 py-3 rounded-none text-sm text-[#8C6845] font-semibold hover:bg-[#FFF5EC] transition mb-2"
+            className="w-full flex items-center justify-center gap-3 px-3 py-3 rounded-none text-sm text-[#8C6845] font-black hover:bg-[#FFF5EC] transition mb-2 uppercase tracking-wider"
           >
             <Home className="w-4 h-4" />
             Accueil — Tout le catalogue
           </button>
 
           <div className="flex flex-col gap-1">
-            {categories.map(c => (
+            {(() => {
+              const filtered = categories.filter(c => !['gobelets-boissons', 'gobelets-emballages-boissons'].includes(c.slug));
+              const targetIndex = filtered.findIndex(c => c.slug === 'evenementiel');
+              if (targetIndex > -1) {
+                const [evenementiel] = filtered.splice(targetIndex, 1);
+                filtered.unshift(evenementiel);
+              }
+              return filtered;
+            })().map(c => (
               <div key={c.slug} className="overflow-hidden rounded-none">
                 <button
                   type="button"
                   onMouseDown={(e) => e.stopPropagation()}
                   onClick={() => goToCategory(c.slug)}
-                  className={`w-full text-left px-3 py-2.5 text-sm font-medium transition ${
+                  className={`w-full text-center px-3 py-2.5 text-sm font-black transition uppercase tracking-wider ${
                     selectedCategoryId === c.slug
                       ? 'bg-[#A67C52] text-white'
                       : 'text-gray-700 hover:bg-[#FFF5EC] hover:text-[#8C6845]'
@@ -420,7 +486,7 @@ export const Navbar: React.FC = () => {
                   {c.label}
                 </button>
                 {c.subcategories?.length ? (
-                  <div className="px-3 pb-2 pt-1 flex flex-wrap gap-x-2 gap-y-1 text-[10px] text-gray-500">
+                  <div className="px-3 pb-2 pt-1 flex flex-wrap justify-center gap-x-2 gap-y-1 text-[10px] text-gray-500 font-bold">
                     {c.subcategories.map((sub, index) => (
                       <React.Fragment key={sub.slug}>
                         <button
@@ -440,16 +506,16 @@ export const Navbar: React.FC = () => {
             ))}
           </div>
 
-          <div className="border-t border-gray-100 mt-4 pt-4 flex flex-col gap-1">
+          <div className="border-t border-gray-100 mt-4 pt-4 flex flex-col gap-1 text-center">
             <button
               onClick={() => goTo('about')}
-              className="text-left px-3 py-2.5 rounded-none text-sm text-gray-600 hover:bg-gray-50 transition"
+              className="px-3 py-2.5 rounded-none text-sm text-gray-600 hover:bg-gray-50 transition font-black uppercase tracking-wider"
             >
               À propos
             </button>
             <button
               onClick={() => goTo('contact')}
-              className="text-left px-3 py-2.5 rounded-none text-sm text-gray-600 hover:bg-gray-50 transition"
+              className="px-3 py-2.5 rounded-none text-sm text-gray-600 hover:bg-gray-50 transition font-black uppercase tracking-wider"
             >
               Contact
             </button>
@@ -457,13 +523,13 @@ export const Navbar: React.FC = () => {
               <>
                 <button
                   onClick={() => { setView('dashboard'); setMobileMenuOpen(false); }}
-                  className="text-left px-3 py-2.5 rounded-none text-sm text-gray-600 hover:bg-gray-50 transition"
+                  className="px-3 py-2.5 rounded-none text-sm text-gray-600 hover:bg-gray-50 transition font-black uppercase tracking-wider"
                 >
                   Mon compte
                 </button>
                 <button
                   onClick={() => { logout(); setMobileMenuOpen(false); }}
-                  className="text-left px-3 py-2.5 rounded-none text-sm text-red-500 hover:bg-red-50 transition"
+                  className="px-3 py-2.5 rounded-none text-sm text-red-500 hover:bg-red-50 transition font-black uppercase tracking-wider"
                 >
                   Déconnexion
                 </button>
@@ -471,7 +537,7 @@ export const Navbar: React.FC = () => {
             ) : (
               <button
                 onClick={() => { setView('login'); setMobileMenuOpen(false); }}
-                className="mt-2 w-full h-11 text-white text-xs uppercase tracking-widest font-bold rounded-xl transition"
+                className="mt-2 w-full h-11 text-white text-xs uppercase tracking-widest font-black rounded-xl transition"
                 style={{ background: 'linear-gradient(90deg, #8C6845, #A67C52)' }}
               >
                 Se connecter
@@ -485,21 +551,21 @@ export const Navbar: React.FC = () => {
         <div className="grid grid-cols-3">
           <button
             type="button"
-            onClick={() => goTo('shop')}
-            className="flex flex-col items-center justify-center gap-1 py-2.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#6A5830]"
-            aria-label="Boutique"
-          >
-            <Store className="h-5 w-5" />
-            <span>Boutique</span>
-          </button>
-          <button
-            type="button"
             onClick={() => (currentUser ? setView('dashboard') : setView('login'))}
             className="flex flex-col items-center justify-center gap-1 py-2.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#6A5830]"
             aria-label="Connexion"
           >
             <User className="h-5 w-5" />
             <span>Connexion</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => goTo('shop')}
+            className="flex flex-col items-center justify-center gap-1 py-2.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#6A5830]"
+            aria-label="Boutique"
+          >
+            <Store className="h-5 w-5" />
+            <span>Boutique</span>
           </button>
           <button
             type="button"
