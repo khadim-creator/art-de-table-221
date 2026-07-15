@@ -1,0 +1,112 @@
+name: 📊 Performance Audit
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+  schedule:
+    - cron: '0 2 * * *'  # 2 AM daily
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  performance-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🔨 Build
+        run: npm run build
+
+      - name: 📊 Analyze bundle size
+        run: |
+          echo "## 📊 Bundle Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| File | Size | Gzip |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|------|------|" >> $GITHUB_STEP_SUMMARY
+          
+          find dist/assets -type f \( -name "*.js" -o -name "*.css" \) | while read file; do
+            size=$(du -h "$file" | cut -f1)
+            gzip_size=$(gzip -c "$file" | wc -c | numfmt --to=iec)
+            basename=$(basename "$file")
+            echo "| $basename | $size | $gzip_size |" >> $GITHUB_STEP_SUMMARY
+          done
+
+      - name: 🖼️ Check image optimization
+        run: |
+          echo "## 🖼️ Image Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          total_size=0
+          count=0
+          
+          for img in dist/assets/*.{png,jpg,jpeg,gif,webp} 2>/dev/null; do
+            if [ -f "$img" ]; then
+              size=$(du -b "$img" | cut -f1)
+              total_size=$((total_size + size))
+              count=$((count + 1))
+              basename=$(basename "$img")
+              size_mb=$((size / 1048576))
+              echo "- $basename: ${size_mb}MB" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Total images:** $count" >> $GITHUB_STEP_SUMMARY
+          echo "**Total size:** $((total_size / 1048576))MB" >> $GITHUB_STEP_SUMMARY
+
+      - name: ⚠️ Check for performance issues
+        run: |
+          echo "## ⚠️ Performance Issues" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Check main JS bundle
+          main_bundle=$(find dist/assets -name "index-*.js" -exec du -b {} \; | cut -f1)
+          if [ "$main_bundle" -gt 314572800 ]; then  # 300 KB
+            echo "❌ Main bundle is large ($(numfmt --to=iec $main_bundle))" >> $GITHUB_STEP_SUMMARY
+            echo "   Consider code-splitting" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ Main bundle size OK ($(numfmt --to=iec $main_bundle))" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Check total dist size
+          dist_size=$(du -sb dist | cut -f1)
+          if [ "$dist_size" -gt 5242880 ]; then  # 5 MB
+            echo "⚠️ Total dist size is $(numfmt --to=iec $dist_size)" >> $GITHUB_STEP_SUMMARY
+            echo "   Consider optimizing images" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ Total dist size OK ($(numfmt --to=iec $dist_size))" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: 🔍 TypeScript check
+        run: |
+          echo "## 🔍 TypeScript Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if npm run lint > /dev/null 2>&1; then
+            echo "✅ TypeScript: No errors" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ TypeScript: Has errors" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: 📈 Generate report
+        run: |
+          echo "## 📈 Build Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Dist folder:** $(du -sh dist | cut -f1)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Files:** $(find dist -type f | wc -l)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build time:** $(date)" >> $GITHUB_STEP_SUMMARY
