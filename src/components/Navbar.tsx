@@ -208,14 +208,14 @@ export const Navbar: React.FC = () => {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Desktop header layout */}
-          <div className="hidden md:grid md:grid-cols-3 items-center h-[6.8rem] w-full">
+          <div className="hidden md:grid md:grid-cols-3 items-center h-[4.8rem] w-full">
             {/* Left: Logo */}
             <div className="flex items-center justify-start">
               <button onClick={() => goTo('home')} className="group shrink-0" aria-label="Retour à l'accueil">
                 <img
                   src={logoImg}
                   alt="Art de Table"
-                  className="h-[6.3rem] w-[6.3rem] object-contain transition-transform duration-200 group-hover:scale-105"
+                  className="h-[4.5rem] w-[4.5rem] object-contain transition-transform duration-200 group-hover:scale-105"
                 />
               </button>
             </div>
@@ -234,7 +234,7 @@ export const Navbar: React.FC = () => {
                   }}
                   onFocus={() => setView('shop')}
                   placeholder="Rechercher un produit..."
-                  className="h-[3.1rem] w-full rounded-none border border-[#A67C52]/18 bg-white pl-11 pr-4 text-[15px] text-[#2A1B13] placeholder:text-stone-400 shadow-sm outline-none transition focus:border-[#A67C52]/35 focus:ring-2 focus:ring-[#A67C52]/10 font-bold"
+                  className="h-[2.65rem] w-full rounded-none border border-[#A67C52]/18 bg-white pl-11 pr-4 text-[14px] text-[#2A1B13] placeholder:text-stone-400 shadow-sm outline-none transition focus:border-[#A67C52]/35 focus:ring-2 focus:ring-[#A67C52]/10 font-bold"
                   aria-label="Recherche"
                 />
               </div>
@@ -245,7 +245,7 @@ export const Navbar: React.FC = () => {
               {/* Connexion Button (only User icon, no text, navbar bg) */}
               <button
                 onClick={() => setView(currentUser ? 'dashboard' : 'login')}
-                className="flex h-[2.8rem] w-[2.8rem] items-center justify-center rounded-full bg-[#8C6845] text-white hover:bg-[#8C6845]/90 transition"
+                className="flex h-[2.45rem] w-[2.45rem] items-center justify-center rounded-full bg-[#8C6845] text-white hover:bg-[#8C6845]/90 transition"
                 aria-label="Connexion"
               >
                 <User className="w-5 h-5" />
@@ -254,7 +254,7 @@ export const Navbar: React.FC = () => {
               {/* Cart Button (ShoppingBag icon, no text, navbar bg, spaced from login) */}
               <button
                 onClick={() => setView('cart')}
-                className="relative flex h-[2.8rem] w-[2.8rem] items-center justify-center rounded-full bg-[#8C6845] text-white hover:bg-[#8C6845]/90 transition"
+                className="relative flex h-[2.45rem] w-[2.45rem] items-center justify-center rounded-full bg-[#8C6845] text-white hover:bg-[#8C6845]/90 transition"
                 aria-label="Panier"
               >
                 <ShoppingBag className="w-5 h-5" />
@@ -269,7 +269,7 @@ export const Navbar: React.FC = () => {
               {currentUser && (currentUser?.isAdmin || currentUser?.email?.toLowerCase() === 'khadxxm05@gmail.com') && (
                 <button
                   onClick={() => setView('admin-dashboard')}
-                  className="flex h-[2.8rem] w-[2.8rem] items-center justify-center rounded-full bg-[#8C6845] text-white hover:bg-[#8C6845]/90 transition"
+                  className="flex h-[2.45rem] w-[2.45rem] items-center justify-center rounded-full bg-[#8C6845] text-white hover:bg-[#8C6845]/90 transition"
                   aria-label="Administration"
                 >
                   <ShieldCheck className="w-5 h-5" />
@@ -280,7 +280,7 @@ export const Navbar: React.FC = () => {
               {currentUser && (
                 <button
                   onClick={logout}
-                  className="flex h-[2.8rem] w-[2.8rem] items-center justify-center rounded-full bg-[#8C6845] text-white hover:bg-[#8C6845]/90 transition"
+                  className="flex h-[2.45rem] w-[2.45rem] items-center justify-center rounded-full bg-[#8C6845] text-white hover:bg-[#8C6845]/90 transition"
                   aria-label="Déconnexion"
                 >
                   <LogOut className="w-5 h-5" />
@@ -313,13 +313,13 @@ export const Navbar: React.FC = () => {
         </div>
       </header>
 
-      <nav className="fixed top-[6.2rem] left-0 right-0 z-40 hidden md:block border-b border-[#A67C52]/14 bg-[#8C6845]">
+      <nav className="fixed top-[4.8rem] left-0 right-0 z-40 hidden md:block border-b border-[#A67C52]/14 bg-[#8C6845]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center gap-1.5 overflow-visible whitespace-nowrap py-2 scrollbar-none">
+          <div className="flex items-center justify-center gap-1.5 overflow-visible whitespace-nowrap py-1.5 scrollbar-none">
             <button
               type="button"
               onClick={goToHome}
-              className={`flex h-10 shrink-0 items-center gap-1.5 rounded-none border-b-2 px-3 text-[12px] font-black uppercase tracking-[0.18em] transition-all duration-200 ${
+              className={`flex h-8 shrink-0 items-center gap-1.5 rounded-none border-b-2 px-2.5 text-[11px] font-black uppercase tracking-[0.16em] transition-all duration-200 ${
                 currentView === 'home'
                   ? 'text-white border-white/80 bg-white/10'
                   : 'text-white/85 border-transparent hover:text-white hover:bg-white/10 hover:border-white/40'
@@ -334,7 +334,7 @@ export const Navbar: React.FC = () => {
             <div className="relative group shrink-0">
               <button
                 type="button"
-                className="flex h-10 items-center gap-1.5 rounded-none border-b-2 border-transparent px-3 text-[12px] font-black uppercase tracking-[0.18em] text-white/85 transition-all duration-200 hover:bg-white/10 hover:text-white hover:border-white/40"
+                className="flex h-8 items-center gap-1.5 rounded-none border-b-2 border-transparent px-2.5 text-[11px] font-black uppercase tracking-[0.16em] text-white/85 transition-all duration-200 hover:bg-white/10 hover:text-white hover:border-white/40"
               >
                 <Menu className="h-3.5 w-3.5" />
                 <span>Catalogue complet</span>
@@ -381,7 +381,7 @@ export const Navbar: React.FC = () => {
                   type="button"
                   onMouseDown={(e) => e.stopPropagation()}
                   onClick={() => goToCategory(link.slug)}
-                  className={`flex h-10 shrink-0 items-center rounded-none border-b-2 px-3 text-[12px] font-black uppercase tracking-[0.14em] transition-all duration-200 ${
+                  className={`flex h-8 shrink-0 items-center rounded-none border-b-2 px-2.5 text-[11px] font-black uppercase tracking-[0.13em] transition-all duration-200 ${
                     selectedCategoryId === link.slug && currentView === 'shop'
                       ? 'text-white border-white/80 bg-white/10'
                       : 'text-white/85 border-transparent hover:text-white hover:bg-white/10 hover:border-white/40'
@@ -399,7 +399,7 @@ export const Navbar: React.FC = () => {
               type="button"
               onMouseDown={(e) => e.stopPropagation()}
               onClick={() => goTo('about')}
-              className={`flex h-10 shrink-0 items-center rounded-none border-b-2 px-3 text-[12px] font-black uppercase tracking-[0.14em] transition-all duration-200 ${
+              className={`flex h-8 shrink-0 items-center rounded-none border-b-2 px-2.5 text-[11px] font-black uppercase tracking-[0.13em] transition-all duration-200 ${
                 currentView === 'about'
                   ? 'text-white border-white/80 bg-white/10'
                   : 'text-white/85 border-transparent hover:text-white hover:bg-white/10 hover:border-white/40'
@@ -414,7 +414,7 @@ export const Navbar: React.FC = () => {
               type="button"
               onMouseDown={(e) => e.stopPropagation()}
               onClick={() => goTo('contact')}
-              className="flex h-10 shrink-0 items-center rounded-none border-b-2 border-transparent px-3 text-[12px] font-black uppercase tracking-[0.14em] text-white/85 transition-all duration-200 hover:bg-white/10 hover:text-white hover:border-white/40"
+              className="flex h-8 shrink-0 items-center rounded-none border-b-2 border-transparent px-2.5 text-[11px] font-black uppercase tracking-[0.13em] text-white/85 transition-all duration-200 hover:bg-white/10 hover:text-white hover:border-white/40"
             >
               Contact
             </button>

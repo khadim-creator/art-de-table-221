@@ -78,7 +78,7 @@ const NavigationRouterContent: React.FC = () => {
           </main>
         }
       >
-        <div key={currentView} className="flex-grow pt-[6.2rem] md:pt-[5.8rem] pb-0 page-fade-in">
+        <div key={currentView} className="flex-grow pt-[6.2rem] md:pt-[7.55rem] pb-0 page-fade-in">
           {handleRenderActiveView()}
         </div>
       </Suspense>

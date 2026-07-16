@@ -180,11 +180,11 @@ export const ShopView: React.FC = () => {
 
         {activeCategory && (
           <div className="-mx-4 mb-5 overflow-hidden rounded-b-[1.75rem] rounded-t-none border-x-0 border-t-0 border-b border-white/70 bg-white/85 shadow-[0_10px_28px_rgba(166,124,82,0.10)] sm:-mx-6 lg:-mx-8">
-            <div className="relative h-[144px] sm:h-[160px] lg:h-[172px] overflow-hidden bg-[#F4E2D1]">
+            <div className="relative aspect-[458/128] min-h-[112px] overflow-hidden bg-[#F4E2D1] sm:min-h-[144px] lg:min-h-0">
               <img
                 src={getCategoryBannerSrc(activeCategory.id)}
                 alt={activeCategory.name}
-                className="h-full w-full object-cover object-center"
+                className="h-full w-full object-contain object-center"
               />
             </div>
           </div>
